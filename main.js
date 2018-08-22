@@ -15,9 +15,8 @@ $(document).ready(function(){
   $('select').prettyDropdown();
 })
 
-
 function addOptions(elementId, selectValues){
-    $.each(selectValues, function(value) {   
+    $.each(selectValues, function(key, value) {   
      $('#'+elementId)
          .append($("<option></option>")
                     .attr("value", value)
