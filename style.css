@@ -43,6 +43,16 @@
 	margin: 25px auto;
 }
 
+.selectorNum {
+	color: cornflowerblue;
+    font-size: 18pt;
+    border-color: cornflowerblue;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 20px;
+    padding: 5px 13px;
+}
+
 .prettydropdown {
-	margin: 0px 30px;
+	margin: 0px 30px 0px 15px;
 }
