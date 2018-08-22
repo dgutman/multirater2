@@ -1,5 +1,8 @@
 #main_svg {
 	height: 50vh;
+	border-color: blue;
+	border-style: solid;
+	border-width: 1px;
 }
 
 #menubar {
@@ -33,4 +36,13 @@
     cursor: pointer;
     letter-spacing: 0.2px;
     color: #6E7480;
+}
+
+#selectors {
+	display: table;
+	margin: 25px auto;
+}
+
+.prettydropdown {
+	margin: 0px 30px;
 }
