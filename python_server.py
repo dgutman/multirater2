@@ -59,6 +59,14 @@ def retrieveSegmentationMask(image_id):
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 	return pixelJson
 
+@app.route("/studyList")
+def retrieveStudyList():
+	url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
+	resp = urllib.request.urlopen(url) #retrieve data
+	resp = resp.read().decode('utf-8') #parse data
+	studyList = json.loads(resp)[0]
+	return StudyList
+
 @app.route("/")
 def main():
 	return "Welcome to Multirater 2.0"
