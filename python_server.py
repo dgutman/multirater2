@@ -41,7 +41,7 @@ def retrievePixelDataAsJson(contour_data):
 	return json_data #return data as json
 
 @app.route("/annotation/<annotation_id>/<feature_id>/mask")
-def main(annotation_id, feature_id):
+def retrieveAnnotationMask(annotation_id, feature_id):
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+annotation_id+'/'+feature_id+'/mask' #create url for ISIC annotation mask endpoint
 	image = url_to_image(url) #get image
 	contour_data = getContours(image) #get contours
@@ -58,6 +58,10 @@ def retrieveSegmentationMask(image_id):
 	contour_data = getContours(image) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 	return pixelJson
+
+@app.route("/")
+def main():
+	return "Welcome to Multirater 2.0"
 
 if __name__ == "__main__":
 	app.run(host=HOST, port=PORT)
