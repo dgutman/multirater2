@@ -5,7 +5,7 @@ import urllib
 import imutils
 import numpy as np
 import pandas as pd
-from isic_api import ISICApi
+#from isic_api import ISICApi
 from flask import request, url_for, render_template
 from flask_api import FlaskAPI, status, exceptions
 
@@ -14,6 +14,7 @@ BASE_URL = 'https://isic-archive.com/api/v1/'
 ISIC_ANNOTATION_ENDPOINT = 'annotation'
 ISIC_SEGMENTATION_ENDPOINT = 'segmentation'
 ISIC_STUDY_ENDPOINT = 'study'
+ISIC_IMAGE_ENDPOINT = 'image'
 HOST = "0.0.0.0"
 PORT = 8080
 
@@ -67,6 +68,14 @@ def retrieveStudyList():
 	resp = resp.read().decode('utf-8') #parse data
 	studyList = json.loads(resp)
 	return studyList
+
+@app.route("/imageList/<study_id>")
+def retrieveImageList():
+	url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
+	resp = urllib.request.urlopen(url) #retrieve data
+	resp = resp.read().decode('utf-8') #parse data
+	imageList = json.loads(resp)
+	return imageList
 
 @app.route("/")
 def main():
