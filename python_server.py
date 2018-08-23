@@ -17,6 +17,7 @@ ISIC_STUDY_ENDPOINT = 'study'
 ISIC_IMAGE_ENDPOINT = 'image'
 HOST = "0.0.0.0"
 PORT = 8080
+DIVISOR = 2
 
 def url_to_image(url):
 	resp = urllib.request.urlopen(url) #download image
@@ -38,7 +39,7 @@ def retrievePixelDataAsJson(contour_data):
 	pixel_data = {} #create empty dictionary
 	contour_pixel_data = "" #create empty string
 	for object_num in range(0, len(contour_data)): #loop through individual contour objects
-		for count in range(0, contour_data[object_num].shape[0] - 1): #loop through pixels
+		for count in range(0, contour_data[object_num].shape[0] - 1, DIVISOR): #loop through pixels
 			x1 = contour_data[object_num][count][0][0] #get x coordinate
 			y1 = contour_data[object_num][count][0][1] #get y coordinate
 			contour_pixel_data = contour_pixel_data + str(x1) + "," + str(y1) + " " #append coordinates to string
@@ -47,20 +48,38 @@ def retrievePixelDataAsJson(contour_data):
 	json_data = json.dumps(pixel_data) #convert dictionary to json
 	return json_data #return data as json
 
-@app.route("/annotation/<annotation_id>/<feature_id>/mask")
-def retrieveAnnotationMask(annotation_id, feature_id):
-	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+annotation_id+'/'+feature_id+'/mask' #create url for ISIC annotation mask endpoint
-	image = url_to_image(url) #get image
-	contour_data = getContours(image, segmentation=False) #get contours
-	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
-	return pixelJson
+#@app.route("/annotation/<annotation_id>/<feature_id>/mask")
+#def retrieveAnnotationMask(annotation_id, feature_id):
+#	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+annotation_id+'/'+feature_id+'/mask' #create url for ISIC annotation mask endpoint
+#	image = url_to_image(url) #get image
+#	contour_data = getContours(image, segmentation=False) #get contours
+#	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
+#	return pixelJson
+
+def retrieveData(url):
+	resp = urllib.request.urlopen(url) #retrieve data
+	resp = resp.read().decode('utf-8') #parse data
+	data = json.loads(resp)
+	return data
+
+@app.route("/annotationMasks/<study_id>/<image_id>/<feature>")
+def retrieveAnnotationMasks(study_id, image_id, feature):
+	combined_pixel_data = {}
+	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete' #create url for ISIC annotation mask endpoint
+	annotationData = retrieveData(url)
+	annotation_ids = [annotation["_id"] for annotation in annotationData]
+	for annotation_id in annotation_ids:
+		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+"/"+annotation_id+"/"+feature+"/mask"
+		image = url_to_image(url) #get image
+		contour_data = getContours(image, segmentation=False) #get contours
+		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
+		combined_pixel_data[annotation_id] = pixelJson
+	return combined_pixel_data
 
 @app.route("/featuresForStudyImage/<study_id>/<image_id>")
 def retrieveFeaturesForStudyImage(study_id, image_id):
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete&detail=true' #create url for ISIC annotation mask endpoint
-	resp = urllib.request.urlopen(url) #retrieve data
-	resp = resp.read().decode('utf-8') #parse data
-	annotationData = json.loads(resp)
+	annotationData = retrieveData(url)
 	feature_df = pd.DataFrame(columns=['feature', 'annotation_id'])
 	for annotation in annotationData:
 	    feature_list = list(annotation['markups'].keys())
@@ -87,27 +106,23 @@ def retrieveSegmentationMask(image_id):
 	image = url_to_image(BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'/'+segmentation_id+'/'+'mask') #get image
 	contour_data = getContours(image, segmentation=True) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
-	cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
-	cv2.imwrite("seg_img.jpg", image)
-	f = open("demofile.txt", "w")
-	f.write(str(contour_data))
-	f.close()
+	#cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
+	#cv2.imwrite("seg_img.jpg", image)
+	#f = open("demofile.txt", "w")
+	#f.write(str(contour_data))
+	#f.close()
 	return pixelJson
 
 @app.route("/studyList")
 def retrieveStudyList():
 	url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
-	resp = urllib.request.urlopen(url) #retrieve data
-	resp = resp.read().decode('utf-8') #parse data
-	studyList = json.loads(resp)
+	studyList = retrieveData(url)
 	return studyList
 
 @app.route("/imageList/<study_id>")
 def retrieveImageList(study_id):
 	url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
-	resp = urllib.request.urlopen(url) #retrieve data
-	resp = resp.read().decode('utf-8') #parse data
-	imageList = json.loads(resp)
+	imageList = retrieveData(url)
 	return imageList
 
 @app.route("/")

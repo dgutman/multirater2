@@ -17,18 +17,17 @@ $(document).ready(function() {
     activateSelect('imageSelector', 'Select an Image');
     activateSelect('featureSelector', 'Select a Feature');
     createStudyMenu();
-    
 })
 
 function displayAnnotation(selectedFeature){
 
 }
 
-function getAnnotationData(imageId) {
+function getAnnotationData(studyId, imageId, feature) {
     var annotationMaskData = {};
     annotationMaskData = axios({
         method: 'get',
-        url: "http://localhost:8080/annotation/"+imageId,
+        url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
     }).then(function(response) {
         return response.data;
     });
@@ -71,7 +70,7 @@ function plotSegmentation(imageId) {
              .attr('points', polygonPoints)
              .style("fill", "none")
              .style("stroke", "green")
-             .style("strokeWidth", "30px");
+             .style("stroke-width", "4px");
     })
     createFeatureMenu();
 }
