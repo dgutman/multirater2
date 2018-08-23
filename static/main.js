@@ -2,11 +2,50 @@ var studies = {};
 var studyNames = [];
 var selectedStudy = '';
 var selectedStudyId = '';
+var studyData = {};
+var imageList = [];
+var selectedImageId = '';
+var selectedImageFeatures = [];
 
 $(document).ready(function() {
     var gtoken = '';
     var config = '';
+    displayImage('558d6301bae47801cf734ad1');
+    activateSelect('studySelector', 'Select a Study');
+    activateSelect('imageSelector', 'Select an Image');
+    activateSelect('featureSelector', 'Select a Feature');
+    createStudyMenu();
     
+})
+
+function plotSegmentation(imageId) {
+    var polygonPoints;
+    getSegmentationData(imageId).then(function(data){
+        polygonPoints = data;
+        var img_g = d3.select('g');
+        img_g.append('polygon')
+             .attr('points', polygonPoints)
+             .style("fill", "none")
+             .style("stroke", "green")
+             .style("strokeWidth", "30px");
+    })
+}
+
+function getSegmentationData(imageId) {
+    var segData = {};
+    segData = axios({
+        method: 'get',
+        url: "http://localhost:8080/segmentation/"+imageId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return segData;
+}
+
+function displayImage(imageId) {
+    if ($('#viewer').children().first().length > 0) {
+        $('#viewer').children().first().remove();
+    }
     var svg = d3.select("#viewer")
         .append("svg")
         .attr("id", "main_svg")
@@ -14,15 +53,13 @@ $(document).ready(function() {
         .attr("height", "100%")
         .call(d3.zoom().on("zoom", function() {
             svg.attr("transform", d3.event.transform)
-        }).scaleExtent([0.25, 10]))
+        }).scaleExtent([0.1, 10]))
         .append("g")
-
     svg.append("svg:image")
-        .attr("xlink:href", "https://isic-archive.com/api/v1/image/558d6301bae47801cf734ad1/download?contentDisposition=inline")
-
-    createStudyMenu();
-
-})
+        .attr("xlink:href", "https://isic-archive.com/api/v1/image/"+imageId+"/download?contentDisposition=inline")
+        //.attr("transform", "translate(400,100) scale(0.25)")
+    plotSegmentation(imageId);
+}
 
 function createStudyMenu(){
     var studyNamesTmp = [];
@@ -40,8 +77,29 @@ function createStudyMenu(){
                     selectedStudyId = value['_id'];
                 }
             });
+            createImageMenu();
         });
+    });
+}
 
+function createImageMenu(){
+    var imageListTmp = [];
+    getImageList(selectedStudyId).then(function(data){
+        studyData = data;
+        $.each(studyData['images'], function(x) {
+            imageListTmp.push(studyData['images'][x].name)
+        });
+        imageList = imageListTmp;
+        addOptions('imageSelector', imageList, 'Select an Image');
+        $('#imageSelector').change(function(){
+            selectedImage = this.value;
+           $.each(studyData['images'], function(key, value) {
+                if (value.name == selectedImage) {
+                    selectedImageId = value['_id'];
+                }
+            });
+           displayImage(selectedImageId);
+        })
     });
 }
 
@@ -52,6 +110,11 @@ function addOptions(elementId, selectValues, placeholderText) {
                 .attr("value", value)
                 .text(value));
     });
+    activateSelect(elementId, placeholderText);
+    $('#' + elementId).val(null).trigger('change');
+}
+
+function activateSelect(elementId, placeholderText){
     $('#' + elementId).select2({
         placeholder: {
             id: '-1', // the value of the option
@@ -59,7 +122,6 @@ function addOptions(elementId, selectValues, placeholderText) {
         },
         allowClear: true
     });
-    $('#' + elementId).val(null).trigger('change');
 }
 
 function authenticate(user, ps) {
@@ -97,3 +159,16 @@ function getStudyList() {
     });
     return studyList;
 }
+
+function getImageList(studyId) {
+    var imageList = {};
+    imageList = axios({
+        method: 'get',
+        url: "http://localhost:8080/imageList/"+studyId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return imageList;
+}
+
+

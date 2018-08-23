@@ -24,9 +24,13 @@ def url_to_image(url):
 	image = cv2.imdecode(image, cv2.IMREAD_COLOR) #convert to opencv format
 	return image #return image in opencv format
 
-def getContours(image):
+def getContours(image, segmentation):
+	if segmentation == True:
+		retrievalMode = cv2.RETR_EXTERNAL
+	else:
+		retrievalMode = cv2.RETR_LIST
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #convert image to grayscale
-	contours = cv2.findContours(gray.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE) #find the contours
+	contours = cv2.findContours(gray.copy(), retrievalMode, cv2.CHAIN_APPROX_SIMPLE) #find the contours
 	contours = contours[0] if imutils.is_cv2() else contours[1] #adjust for opencv version
 	return contours #return the contours as list of arrays
 
@@ -39,6 +43,7 @@ def retrievePixelDataAsJson(contour_data):
 			y1 = contour_data[object_num][count][0][1] #get y coordinate
 			contour_pixel_data = contour_pixel_data + str(x1) + "," + str(y1) + " " #append coordinates to string
 		pixel_data[object_num] = contour_pixel_data #append contour objects to dictionary
+	pixel_data = contour_pixel_data
 	json_data = json.dumps(pixel_data) #convert dictionary to json
 	return json_data #return data as json
 
@@ -46,7 +51,7 @@ def retrievePixelDataAsJson(contour_data):
 def retrieveAnnotationMask(annotation_id, feature_id):
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+annotation_id+'/'+feature_id+'/mask' #create url for ISIC annotation mask endpoint
 	image = url_to_image(url) #get image
-	contour_data = getContours(image) #get contours
+	contour_data = getContours(image, segmentation=False) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 	return pixelJson
 
@@ -57,8 +62,13 @@ def retrieveSegmentationMask(image_id):
 	resp = resp.read().decode('utf-8') #parse data
 	segmentation_id = json.loads(resp)[0]['_id'] #retrieve segmentation id from list of segmentations
 	image = url_to_image(BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'/'+segmentation_id+'/'+'mask') #get image
-	contour_data = getContours(image) #get contours
+	contour_data = getContours(image, segmentation=True) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
+	cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
+	cv2.imwrite("seg_img.jpg", image)
+	f = open("demofile.txt", "w")
+	f.write(str(contour_data))
+	f.close()
 	return pixelJson
 
 @app.route("/studyList")
@@ -70,7 +80,7 @@ def retrieveStudyList():
 	return studyList
 
 @app.route("/imageList/<study_id>")
-def retrieveImageList():
+def retrieveImageList(study_id):
 	url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
 	resp = urllib.request.urlopen(url) #retrieve data
 	resp = resp.read().decode('utf-8') #parse data
