@@ -44,7 +44,6 @@ def retrievePixelDataAsJson(contour_data):
 			y1 = contour_data[object_num][count][0][1] #get y coordinate
 			contour_pixel_data = contour_pixel_data + str(x1) + "," + str(y1) + " " #append coordinates to string
 		pixel_data[object_num] = contour_pixel_data #append contour objects to dictionary
-	pixel_data = contour_pixel_data
 	json_data = json.dumps(pixel_data) #convert dictionary to json
 	return json_data #return data as json
 
@@ -64,12 +63,15 @@ def retrieveData(url):
 
 @app.route("/annotationMasks/<study_id>/<image_id>/<feature>")
 def retrieveAnnotationMasks(study_id, image_id, feature):
+	feature2 = urllib.parse.quote(feature.replace("_", "%2F"))
+	print(feature2)
 	combined_pixel_data = {}
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete' #create url for ISIC annotation mask endpoint
 	annotationData = retrieveData(url)
 	annotation_ids = [annotation["_id"] for annotation in annotationData]
 	for annotation_id in annotation_ids:
-		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+"/"+annotation_id+"/"+feature+"/mask"
+		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+"/"+annotation_id+"/"+feature2+"/mask"
+		print(url)
 		image = url_to_image(url) #get image
 		contour_data = getContours(image, segmentation=False) #get contours
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
@@ -106,6 +108,7 @@ def retrieveSegmentationMask(image_id):
 	image = url_to_image(BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'/'+segmentation_id+'/'+'mask') #get image
 	contour_data = getContours(image, segmentation=True) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
+	print(pixelJson[0])
 	#cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
 	#cv2.imwrite("seg_img.jpg", image)
 	#f = open("demofile.txt", "w")

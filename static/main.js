@@ -8,6 +8,7 @@ var selectedImageId = '';
 var selectedImageFeatures = [];
 var selectedFeature = '';
 var featureData = {};
+var combinedAnnotationData = {};
 
 $(document).ready(function() {
     var gtoken = '';
@@ -19,12 +20,9 @@ $(document).ready(function() {
     createStudyMenu();
 })
 
-function displayAnnotation(selectedFeature){
-
-}
-
 function getAnnotationData(studyId, imageId, feature) {
     var annotationMaskData = {};
+    //feature = feature.replace("/", "%2F")
     annotationMaskData = axios({
         method: 'get',
         url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
@@ -45,7 +43,7 @@ function createFeatureMenu() {
         addOptions('featureSelector', featureList, 'Select a Feature');
         $('#featureSelector').change(function(){
             selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
-            displayAnnotation(selectedFeature);
+            displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
         })
     });
 }
@@ -61,10 +59,33 @@ function getFeatureList(studyId, imageId) {
     return featureList;
 }
 
+function displayAnnotation(selectedFeature){
+    //var polygonPoints;
+    getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
+        combinedAnnotationData = data;
+        var img_g = d3.select('g');
+        var colors = ['red', 'blue', 'orange', 'yellow', 'pink']
+        for (var i=0; i<Object.keys(combinedAnnotationData).length; i++) {
+            var polygonPointString = combinedAnnotationData[Object.keys(combinedAnnotationData)[i]];
+            var polygonPoints = polygonPointString.substring(1)
+            polygonPoints = polygonPoints.substring(0, polygonPointString.length - 2);
+            console.log(polygonPoints);
+            console.log(polygonPoints.length);
+            if (polygonPoints.length > 5) {
+                img_g.append('polygon')
+                     .attr('points', polygonPoints)
+                     .style("fill", colors[i])
+                     .style("stroke", "black")
+                     .style("stroke-width", "4px");
+            }
+        }
+    })
+}
+
 function plotSegmentation(imageId) {
     var polygonPoints;
     getSegmentationData(imageId).then(function(data){
-        polygonPoints = data;
+        polygonPoints = data[0];
         var img_g = d3.select('g');
         img_g.append('polygon')
              .attr('points', polygonPoints)
