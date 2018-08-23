@@ -55,6 +55,29 @@ def retrieveAnnotationMask(annotation_id, feature_id):
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 	return pixelJson
 
+@app.route("/featuresForStudyImage/<study_id>/<image_id>")
+def retrieveFeaturesForStudyImage(study_id, image_id):
+	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete&detail=true' #create url for ISIC annotation mask endpoint
+	resp = urllib.request.urlopen(url) #retrieve data
+	resp = resp.read().decode('utf-8') #parse data
+	annotationData = json.loads(resp)
+	feature_df = pd.DataFrame(columns=['feature', 'user'])
+	for annotation in annotationData:
+	    feature_list = list(annotation['markups'].keys())
+	    user = annotation['user']['name']
+	    for feature in feature_list:
+	        feature_df = feature_df.append({'feature': feature, 'user':user}, ignore_index=True)
+	feature_df = feature_df.pivot(index='feature', columns='user', values='user')
+	feat_dict = {}
+	for row_num in range(0, len(feature_df.index)):
+	    user_list = []
+	    for col_num in range(0, len(feature_df.columns)):
+	        if type(feature_df.iloc[row_num, col_num]) is str:
+	            user_list.append(feature_df.iloc[row_num, col_num])
+	    feat_dict[feature_df.index[row_num]] = user_list
+	featureJson = json.dumps(feat_dict)
+	return featureJson
+
 @app.route("/segmentation/<image_id>")
 def retrieveSegmentationMask(image_id):
 	url = BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'?imageId='+image_id #create url for ISIC segmentation endpoint
