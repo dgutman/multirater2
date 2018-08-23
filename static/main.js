@@ -6,6 +6,8 @@ var studyData = {};
 var imageList = [];
 var selectedImageId = '';
 var selectedImageFeatures = [];
+var selectedFeature = '';
+var featureData = {};
 
 $(document).ready(function() {
     var gtoken = '';
@@ -18,6 +20,48 @@ $(document).ready(function() {
     
 })
 
+function displayAnnotation(selectedFeature){
+
+}
+
+function getAnnotationData(imageId) {
+    var annotationMaskData = {};
+    annotationMaskData = axios({
+        method: 'get',
+        url: "http://localhost:8080/annotation/"+imageId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return annotationMaskData;
+}
+
+function createFeatureMenu() {
+    var featureListTmp = [];
+    getFeatureList(selectedStudyId, selectedImageId).then(function(data){
+        featureData = data;
+        $.each(featureData, function(x) {
+            featureListTmp.push(x + " ["+featureData[x].length+"]");
+        });
+        featureList = featureListTmp;
+        addOptions('featureSelector', featureList, 'Select a Feature');
+        $('#featureSelector').change(function(){
+            selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
+            displayAnnotation(selectedFeature);
+        })
+    });
+}
+
+function getFeatureList(studyId, imageId) {
+    var featureList = {};
+    featureList = axios({
+        method: 'get',
+        url: "http://localhost:8080/featuresForStudyImage/"+studyId+'/'+imageId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return featureList;
+}
+
 function plotSegmentation(imageId) {
     var polygonPoints;
     getSegmentationData(imageId).then(function(data){
@@ -29,6 +73,7 @@ function plotSegmentation(imageId) {
              .style("stroke", "green")
              .style("strokeWidth", "30px");
     })
+    createFeatureMenu();
 }
 
 function getSegmentationData(imageId) {
@@ -59,6 +104,7 @@ function displayImage(imageId) {
         .attr("xlink:href", "https://isic-archive.com/api/v1/image/"+imageId+"/download?contentDisposition=inline")
         //.attr("transform", "translate(400,100) scale(0.25)")
     plotSegmentation(imageId);
+
 }
 
 function createStudyMenu(){

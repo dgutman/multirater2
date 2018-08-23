@@ -61,20 +61,20 @@ def retrieveFeaturesForStudyImage(study_id, image_id):
 	resp = urllib.request.urlopen(url) #retrieve data
 	resp = resp.read().decode('utf-8') #parse data
 	annotationData = json.loads(resp)
-	feature_df = pd.DataFrame(columns=['feature', 'user'])
+	feature_df = pd.DataFrame(columns=['feature', 'annotation_id'])
 	for annotation in annotationData:
 	    feature_list = list(annotation['markups'].keys())
-	    user = annotation['user']['name']
+	    annotation_id = annotation['_id']
 	    for feature in feature_list:
-	        feature_df = feature_df.append({'feature': feature, 'user':user}, ignore_index=True)
-	feature_df = feature_df.pivot(index='feature', columns='user', values='user')
+	        feature_df = feature_df.append({'feature': feature, 'annotation_id':annotation_id}, ignore_index=True)
+	feature_df = feature_df.pivot(index='feature', columns='annotation_id', values='annotation_id')
 	feat_dict = {}
 	for row_num in range(0, len(feature_df.index)):
-	    user_list = []
+	    annotation_list = []
 	    for col_num in range(0, len(feature_df.columns)):
 	        if type(feature_df.iloc[row_num, col_num]) is str:
-	            user_list.append(feature_df.iloc[row_num, col_num])
-	    feat_dict[feature_df.index[row_num]] = user_list
+	            annotation_list.append(feature_df.iloc[row_num, col_num])
+	    feat_dict[feature_df.index[row_num]] = annotation_list
 	featureJson = json.dumps(feat_dict)
 	return featureJson
 
