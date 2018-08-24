@@ -32,7 +32,7 @@ function getAnnotationData(studyId, imageId, feature) {
     return annotationMaskData;
 }
 
-function createFeatureMenu() {
+function createFeatureMenu() { //need to clear feature menu
     var featureListTmp = [];
     getFeatureList(selectedStudyId, selectedImageId).then(function(data){
         featureData = data;
@@ -59,24 +59,36 @@ function getFeatureList(studyId, imageId) {
     return featureList;
 }
 
+function plotPointsOnImage(polygonPoints, color){
+    var img_g = d3.select('g');
+    img_g.append('polygon')
+         .attr('points', polygonPoints)
+         .style("fill", color)
+         .style("stroke", "black")
+         .style("stroke-width", "4px");
+}
+
+function trimFirstLast(string){
+    var string = string.substring(1)
+    string = string.substring(0, string.length - 2);
+    return string
+}
+
 function displayAnnotation(selectedFeature){
     //var polygonPoints;
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
         combinedAnnotationData = data;
-        var img_g = d3.select('g');
+        console.log(combinedAnnotationData);
+        
         var colors = ['red', 'blue', 'orange', 'yellow', 'pink']
         for (var i=0; i<Object.keys(combinedAnnotationData).length; i++) {
             var polygonPointString = combinedAnnotationData[Object.keys(combinedAnnotationData)[i]];
-            var polygonPoints = polygonPointString.substring(1)
-            polygonPoints = polygonPoints.substring(0, polygonPointString.length - 2);
-            console.log(polygonPoints);
-            console.log(polygonPoints.length);
-            if (polygonPoints.length > 5) {
-                img_g.append('polygon')
-                     .attr('points', polygonPoints)
-                     .style("fill", colors[i])
-                     .style("stroke", "black")
-                     .style("stroke-width", "4px");
+            polygonPointJson = JSON.parse(polygonPointString)
+            for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
+                polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]]
+                if (polygonPoints.length > 100) {
+                    plotPointsOnImage(polygonPoints, colors[i]);
+                }
             }
         }
     })

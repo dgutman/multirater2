@@ -17,7 +17,7 @@ ISIC_STUDY_ENDPOINT = 'study'
 ISIC_IMAGE_ENDPOINT = 'image'
 HOST = "0.0.0.0"
 PORT = 8080
-DIVISOR = 2
+DIVISOR = 1
 
 def url_to_image(url):
 	resp = urllib.request.urlopen(url) #download image
@@ -29,16 +29,16 @@ def getContours(image, segmentation):
 	if segmentation == True:
 		retrievalMode = cv2.RETR_EXTERNAL
 	else:
-		retrievalMode = cv2.RETR_LIST
+		retrievalMode = cv2.RETR_EXTERNAL#cv2.RETR_LIST
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #convert image to grayscale
-	contours = cv2.findContours(gray.copy(), retrievalMode, cv2.CHAIN_APPROX_SIMPLE) #find the contours
+	contours = cv2.findContours(gray.copy(), retrievalMode, cv2.CHAIN_APPROX_NONE)#cv2.CHAIN_APPROX_SIMPLE) #find the contours
 	contours = contours[0] if imutils.is_cv2() else contours[1] #adjust for opencv version
 	return contours #return the contours as list of arrays
 
 def retrievePixelDataAsJson(contour_data):
 	pixel_data = {} #create empty dictionary
-	contour_pixel_data = "" #create empty string
 	for object_num in range(0, len(contour_data)): #loop through individual contour objects
+		contour_pixel_data = "" #create empty string
 		for count in range(0, contour_data[object_num].shape[0] - 1, DIVISOR): #loop through pixels
 			x1 = contour_data[object_num][count][0][0] #get x coordinate
 			y1 = contour_data[object_num][count][0][1] #get y coordinate
@@ -76,6 +76,8 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 		contour_data = getContours(image, segmentation=False) #get contours
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 		combined_pixel_data[annotation_id] = pixelJson
+		cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
+		cv2.imwrite(annotation_id+"_img.jpg", image)
 	return combined_pixel_data
 
 @app.route("/featuresForStudyImage/<study_id>/<image_id>")
