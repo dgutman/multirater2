@@ -76,8 +76,8 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 		contour_data = getContours(image, segmentation=False) #get contours
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 		combined_pixel_data[annotation_id] = pixelJson
-		cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
-		cv2.imwrite(annotation_id+"_img.jpg", image)
+		#cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
+		#cv2.imwrite(annotation_id+"_img.jpg", image)
 	return combined_pixel_data
 
 @app.route("/featuresForStudyImage/<study_id>/<image_id>")
