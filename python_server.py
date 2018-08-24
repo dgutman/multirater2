@@ -17,7 +17,7 @@ ISIC_STUDY_ENDPOINT = 'study'
 ISIC_IMAGE_ENDPOINT = 'image'
 HOST = "0.0.0.0"
 PORT = 8080
-DIVISOR = 1
+DIVISOR = 10
 
 def url_to_image(url):
 	resp = urllib.request.urlopen(url) #download image
