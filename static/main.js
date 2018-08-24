@@ -14,20 +14,34 @@ $(document).ready(function() {
     var gtoken = '';
     var config = '';
     displayImage('558d6301bae47801cf734ad1');
+    activateLoader();
     activateSelect('studySelector', 'Select a Study');
     activateSelect('imageSelector', 'Select an Image');
     activateSelect('featureSelector', 'Select a Feature');
     createStudyMenu();
 })
 
+function activateLoader() {
+    var imgViewer = d3.select('#viewer');
+    imgViewer.append('div')
+             .attr("id", "loadingDiv")
+
+    var loadingDiv = d3.select('#loadingDiv');
+    loadingDiv.append('img')
+              .attr("id", "loadingImg")
+              .attr("src", "http://gifimage.net/wp-content/uploads/2017/09/ajax-loading-gif-transparent-background-8.gif")
+}
+
 function getAnnotationData(studyId, imageId, feature) {
     var annotationMaskData = {};
     //feature = feature.replace("/", "%2F")
+    d3.select('#loadingDiv').attr("style", "display:block");
     annotationMaskData = axios({
         method: 'get',
         url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
     }).then(function(response) {
         return response.data;
+
     });
     return annotationMaskData;
 }
@@ -91,6 +105,7 @@ function displayAnnotation(selectedFeature){
                 }
             }
         }
+        d3.select('#loadingDiv').attr("style", "display:none");
     })
 }
 

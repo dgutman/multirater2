@@ -70,3 +70,20 @@
     margin-top: -10px !important;
     margin-right: 4px !important;
 }
+
+#loadingDiv {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: ghostwhite;
+    opacity: 0.8;
+    display: none;
+}
+
+#loadingImg {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    z-index: 20;
+}
