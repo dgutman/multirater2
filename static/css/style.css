@@ -91,6 +91,8 @@
 
 .polygons {
     mix-blend-mode: multiply;
+    stroke: black;
+    stroke-width: 4px;
 /*    isolation: isolate; */
 }
 

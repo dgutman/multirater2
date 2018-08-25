@@ -9,6 +9,18 @@ var selectedImageFeatures = [];
 var selectedFeature = '';
 var featureData = {};
 var combinedAnnotationData = {};
+var svgCoords;
+var imgCoords;
+var origImgWidth;
+var origImgHeight;
+var currentImgWidth;
+var currentImgHeight;
+var unscaledCoords;
+var multiraterMatrix;
+var timer;
+//var arr;
+var polygonTemp;
+var numRaters;
 
 $(document).ready(function() {
     var gtoken = '';
@@ -28,13 +40,13 @@ $(document).ready(function() {
     activateSelect('studySelector', 'Select a Study');
     activateSelect('imageSelector', 'Select an Image');
     activateSelect('featureSelector', 'Select a Feature');
+    createStudyMenu();
     $('#featureSelector').change(function(){
         selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
         if (selectedFeature != "") {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
         }
     });
-    createStudyMenu();
 })
 
 function activateLoader() {
@@ -75,7 +87,6 @@ function createFeatureMenu() { //need to clear feature menu
         });
         featureList = featureListTmp;
         addOptions('featureSelector', featureList, 'Select a Feature');
-
     });
 }
 
@@ -97,7 +108,47 @@ function plotPointsOnImage(polygonPoints, color){
          .attr('class', 'polygons')
          .style("fill", color)
          .style("stroke", "black")
-         .style("stroke-width", "4px");
+         .style("stroke-width", "4px")
+         .on("mouseover", function() {
+            d3.select(this)
+                .attr("style", "fill: cyan");
+
+        })
+         .on("mousemove", function(){
+            //polygonTemp = this;
+            numRaters = 0;
+            timer = setTimeout(function(){
+                numRaters = 0;
+                var polys = $('.polygons');
+                for(var i=0; i<polys.length; i++) {
+                    var arr = makeArr(polys[i]);
+                    numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
+                }
+                console.log(numRaters);
+                numRaters = 0;
+            }, 600);
+
+         })
+         .on("mouseout", function() {
+            d3.select(this)
+                .attr("style", "fill: lightgray");
+            clearTimeout(timer);
+            numRaters = 0;
+        })
+}
+
+function makeArr(polygonTemp) {
+    thisPoints = d3.select(polygonTemp).attr('points');
+    x = thisPoints.split(" ");
+    arr = [];
+    for (i=0; i<x.length; i++) {
+        arr_tmp = [];
+        splitt = x[i].split(",");
+        arr_tmp.push(parseInt(splitt[0]));
+        arr_tmp.push(parseInt(splitt[1]));
+        arr.push(arr_tmp);
+    }
+    return arr;
 }
 
 function trimFirstLast(string){
@@ -113,6 +164,8 @@ function displayAnnotation(selectedFeature){
     d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
         combinedAnnotationData = data;
+        multiraterMatrix = data['multiraterMatrix'];
+        delete combinedAnnotationData['multiraterMatrix']
         console.log(combinedAnnotationData);
         
         var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray']
@@ -121,7 +174,7 @@ function displayAnnotation(selectedFeature){
             polygonPointJson = JSON.parse(polygonPointString)
             for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
                 polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]]
-                if (polygonPoints.length > 100) {
+                if (polygonPoints.length > 10) {
                     plotPointsOnImage(polygonPoints, colors[i]);
                 }
             }
@@ -165,9 +218,16 @@ function displayImage(imageId) {
         .attr("xlink:href", "https://isic-archive.com/api/v1/image/"+imageId+"/download?contentDisposition=inline")
         .attr('id', 'svgImage')
         //.attr("transform", "translate(400,100) scale(0.25)")
+    d3.select('#main_svg').on("mousemove", function() {
+        //setTimeout(getCoords(), 500);
+        svgCoords = getCoords(this);
+        unscaledCoords = getUnscaledCoords(svgCoords);
+        //console.log(unscaledCoords);
+    });
     d3.select('#svgImage').on("mousemove", function() {
         //setTimeout(getCoords(), 500);
-        getCoords(this);
+        imgCoords = getCoords(this);
+        //console.log(unscaledCoords);
     });
     plotSegmentation(imageId);
 
@@ -175,8 +235,31 @@ function displayImage(imageId) {
 
 function getCoords(place) {
       var coords = d3.mouse(place);
-      console.log(coords);
+      //currentImgWidth = document.getElementById('outer-g').getBoundingClientRect().width;
+      currentImgHeight = document.getElementById('outer-g').getBoundingClientRect().height;
+      //console.log(coords);
+      return coords;
+}
 
+function getUnscaledCoords(svgCoords) {
+    var t = d3.select('#outer-g').attr("transform");
+
+    if (t != null) {
+        var tr = t.substring(t.indexOf("(")+1, t.indexOf(")")).split(",");
+        var x_translation = parseInt(tr[0]);
+        var y_translation = parseInt(tr[1]);
+    } else {
+        var x_translation = 0;
+        var y_translation = 0;
+    }
+
+    var scaled_x_location = svgCoords[0] - x_translation + 1;
+    var scaled_y_location = svgCoords[1] - y_translation + 1;
+
+    var unscaled_x_location = (origImgHeight/currentImgHeight)*scaled_x_location;
+    var unscaled_y_location = (origImgHeight/currentImgHeight)*scaled_y_location;
+
+    return [unscaled_x_location, unscaled_y_location];
 }
 
 function createStudyMenu(){
@@ -240,6 +323,8 @@ function activateSelect(elementId, placeholderText){
         },
         allowClear: true
     });
+    origImgWidth = document.getElementById('outer-g').getBoundingClientRect().width;
+    origImgHeight = document.getElementById('outer-g').getBoundingClientRect().height;
 }
 
 function authenticate(user, ps) {

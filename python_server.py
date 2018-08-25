@@ -69,6 +69,7 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete' #create url for ISIC annotation mask endpoint
 	annotationData = retrieveData(url)
 	annotation_ids = [annotation["_id"] for annotation in annotationData]
+	counter = 0
 	for annotation_id in annotation_ids:
 		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+"/"+annotation_id+"/"+feature2+"/mask"
 		print(url)
@@ -76,8 +77,17 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 		contour_data = getContours(image, segmentation=False) #get contours
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 		combined_pixel_data[annotation_id] = pixelJson
-		#cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
-		#cv2.imwrite(annotation_id+"_img.jpg", image)
+		if counter != 0:
+			img_matrix = np.add(img_matrix, image, dtype=np.float)
+		else:
+			img_matrix = image
+		counter = counter + 1
+	img_matrix_flat = img_matrix.flatten()
+	img_matrix_flat = img_matrix_flat/255
+	ind = np.where(img_matrix_flat == 2)
+	img_matrix_fl = np.array(ind[0].flatten(), dtype=np.float)
+	img_matrix_json = json.dumps(list(img_matrix_fl))
+	combined_pixel_data['multiraterMatrix'] = img_matrix_json
 	return combined_pixel_data
 
 @app.route("/featuresForStudyImage/<study_id>/<image_id>")
