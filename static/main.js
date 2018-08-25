@@ -28,6 +28,12 @@ $(document).ready(function() {
     activateSelect('studySelector', 'Select a Study');
     activateSelect('imageSelector', 'Select an Image');
     activateSelect('featureSelector', 'Select a Feature');
+    $('#featureSelector').change(function(){
+        selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
+        if (selectedFeature != "") {
+            displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
+        }
+    });
     createStudyMenu();
 })
 
@@ -60,6 +66,7 @@ function getAnnotationData(studyId, imageId, feature) {
 }
 
 function createFeatureMenu() { //need to clear feature menu
+    $('#featureSelector').children().remove();
     var featureListTmp = [];
     getFeatureList(selectedStudyId, selectedImageId).then(function(data){
         featureData = data;
@@ -68,12 +75,7 @@ function createFeatureMenu() { //need to clear feature menu
         });
         featureList = featureListTmp;
         addOptions('featureSelector', featureList, 'Select a Feature');
-        $('#featureSelector').change(function(){
-            selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
-            if (selectedFeature != "") {
-                displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
-            }
-        })
+
     });
 }
 
@@ -106,6 +108,7 @@ function trimFirstLast(string){
 
 function displayAnnotation(selectedFeature){
     //var polygonPoints;
+    $('#inner-g').children().remove();
     console.log(selectedFeature);
     d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
