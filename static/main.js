@@ -13,6 +13,16 @@ var combinedAnnotationData = {};
 $(document).ready(function() {
     var gtoken = '';
     var config = '';
+    var svg = d3.select("#viewer")
+        .append("svg")
+        .attr("id", "main_svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .call(d3.zoom().on("zoom", function() {
+            svg.attr("transform", d3.event.transform)
+        }).scaleExtent([0.1, 10]))
+       .append("g").attr("id", "outer-g")
+    d3.select("#outer-g").append("g").attr("id", "inner-g")
     displayImage('558d6301bae47801cf734ad1');
     activateLoader();
     activateSelect('studySelector', 'Select a Study');
@@ -33,17 +43,20 @@ function activateLoader() {
 }
 
 function getAnnotationData(studyId, imageId, feature) {
-    var annotationMaskData = {};
-    //feature = feature.replace("/", "%2F")
-    d3.select('#loadingDiv').attr("style", "display:block");
-    annotationMaskData = axios({
-        method: 'get',
-        url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
-    }).then(function(response) {
-        return response.data;
+    if (feature != "") {
+        var annotationMaskData = {};
+        //feature = feature.replace("/", "%2F")
+        //console.log(feature);
+        annotationMaskData = axios({
+            method: 'get',
+            url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
+        }).then(function(response) {
+            return response.data;
 
-    });
-    return annotationMaskData;
+        });
+    }
+        return annotationMaskData;
+
 }
 
 function createFeatureMenu() { //need to clear feature menu
@@ -57,7 +70,9 @@ function createFeatureMenu() { //need to clear feature menu
         addOptions('featureSelector', featureList, 'Select a Feature');
         $('#featureSelector').change(function(){
             selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
-            displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
+            if (selectedFeature != "") {
+                displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
+            }
         })
     });
 }
@@ -74,9 +89,10 @@ function getFeatureList(studyId, imageId) {
 }
 
 function plotPointsOnImage(polygonPoints, color){
-    var img_g = d3.select('g');
+    var img_g = d3.select('#inner-g');
     img_g.append('polygon')
          .attr('points', polygonPoints)
+         .attr('class', 'polygons')
          .style("fill", color)
          .style("stroke", "black")
          .style("stroke-width", "4px");
@@ -90,11 +106,13 @@ function trimFirstLast(string){
 
 function displayAnnotation(selectedFeature){
     //var polygonPoints;
+    console.log(selectedFeature);
+    d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
         combinedAnnotationData = data;
         console.log(combinedAnnotationData);
         
-        var colors = ['red', 'blue', 'orange', 'yellow', 'pink']
+        var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray']
         for (var i=0; i<Object.keys(combinedAnnotationData).length; i++) {
             var polygonPointString = combinedAnnotationData[Object.keys(combinedAnnotationData)[i]];
             polygonPointJson = JSON.parse(polygonPointString)
@@ -135,22 +153,26 @@ function getSegmentationData(imageId) {
 }
 
 function displayImage(imageId) {
-    if ($('#viewer').children().first().length > 0) {
-        $('#viewer').children().first().remove();
-    }
-    var svg = d3.select("#viewer")
-        .append("svg")
-        .attr("id", "main_svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .call(d3.zoom().on("zoom", function() {
-            svg.attr("transform", d3.event.transform)
-        }).scaleExtent([0.1, 10]))
-        .append("g")
-    svg.append("svg:image")
+    //if ($('#viewer').children().first().length > 0) {
+    $('#svgImage').remove();
+    $('polygon').remove();
+    //}
+    var svg = d3.select("#outer-g")
+    svg.insert("svg:image", "#inner-g")
         .attr("xlink:href", "https://isic-archive.com/api/v1/image/"+imageId+"/download?contentDisposition=inline")
+        .attr('id', 'svgImage')
         //.attr("transform", "translate(400,100) scale(0.25)")
+    d3.select('#svgImage').on("mousemove", function() {
+        //setTimeout(getCoords(), 500);
+        getCoords(this);
+    });
     plotSegmentation(imageId);
+
+}
+
+function getCoords(place) {
+      var coords = d3.mouse(place);
+      console.log(coords);
 
 }
 

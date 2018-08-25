@@ -79,6 +79,7 @@
     background-color: ghostwhite;
     opacity: 0.8;
     display: none;
+    top: 0;
 }
 
 #loadingImg {
@@ -87,3 +88,13 @@
     display: flex;
     z-index: 20;
 }
+
+.polygons {
+    mix-blend-mode: multiply;
+/*    isolation: isolate; */
+}
+
+#inner-g {
+    isolation: isolate;
+}
+
