@@ -157,6 +157,7 @@ def retrieveImageDetails(image_id):
 	imageDetails = retrieveData(url)
 	imageDetails_min = imageDetails['meta']['clinical']
 	imageDetails_min['image_type'] = imageDetails['meta']['acquisition']['image_type']
+	imageDetails_min.pop('melanocytic', None)
 	print(imageDetails_min);
 	return imageDetails_min
 
