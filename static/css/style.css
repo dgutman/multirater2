@@ -93,8 +93,8 @@
     mix-blend-mode: multiply;
     stroke: none;
     stroke-width: 4px;
-    fill: lightgray;
-/*    isolation: isolate; */
+    fill: lightblue;
+/*    fill-opacity: 1; */
 }
 
 #inner-g {

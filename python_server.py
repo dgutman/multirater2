@@ -69,6 +69,8 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 		contour_data = getContours(image, segmentation=False) #get contours
 		area = np.where(image != 0)
 		area = json.dumps(area[0].size)
+		if area == "0":
+			continue
 		#print(cv2.contourArea(contour_data))
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 		combined_pixel_data[annotation_id] = pixelJson

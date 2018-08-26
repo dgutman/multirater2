@@ -111,7 +111,7 @@ function plotPointsOnImage(polygonPoints, count){
          .attr('class', 'polygons'+' '+user)
          .on("mouseover", function() {
             userclass = this.className['baseVal'].replace("polygons ", '');
-            $('.'+userclass).attr("style", "fill: cyan; stroke: black");
+            $('.'+userclass).attr("style", "fill: blue; stroke: black");
         })
          .on("mousemove", function(){
             timer = setTimeout(function(){
@@ -126,7 +126,7 @@ function plotPointsOnImage(polygonPoints, count){
          })
          .on("mouseout", function() {
             userclass = this.className['baseVal'].replace("polygons ", '');
-            $('.'+userclass).attr("style", "fill: lightgray; stroke: none");
+            $('.'+userclass).attr("style", "fill: lightblue; stroke: none");
             clearTimeout(timer);
             numRaters = 0;
         })
@@ -154,10 +154,12 @@ function trimFirstLast(string){
 
 function displayAnnotation(selectedFeature){
     //var polygonPoints;
+    annotatorAreaOrdered = [];
     $('#inner-g').children().remove();
     console.log(selectedFeature);
     d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
+        annotatorAreaOrdered = [];
         combinedAnnotationData = data;
         multiraterMatrix = JSON.parse(data['multiraterMatrix']);
         delete combinedAnnotationData['multiraterMatrix'];
@@ -172,6 +174,7 @@ function displayAnnotation(selectedFeature){
                 keyNames = keyNames.reverse();
                 for (var i=0; i<keyNames.length; i++) {
                     if (keyNames[i].indexOf("area") != -1) {continue;}
+                    //if (annotatorAreaOrdered[0][i] != "0") {continue;}
                     var polygonPointString = combinedAnnotationData[keyNames[i]];
                     polygonPointJson = JSON.parse(polygonPointString);
                     for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
@@ -181,7 +184,6 @@ function displayAnnotation(selectedFeature){
                         }
                     }
                 }
-
                 d3.select('#loadingDiv').attr("style", "display:none");
             })
         })
