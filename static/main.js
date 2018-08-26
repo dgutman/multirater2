@@ -21,6 +21,7 @@ var timer;
 var segmentationArea;
 var polygonTemp;
 var numRaters;
+var annotatorAreaOrdered;
 
 $(document).ready(function() {
     var gtoken = '';
@@ -168,15 +169,10 @@ function displayAnnotation(selectedFeature){
         origImgWidth = multiraterMatrix['width'];
         origImgHeight = multiraterMatrix['height'];
         var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
-        var keyNames = Object.keys(combinedAnnotationData);
-
-        for (var i=0; i<keyNames.length; i++) {
-            if (keyNames[i].indexOf("area") != -1) {
-                continue;
-            }
-        }
-        
-
+        //var keyNames = Object.keys(combinedAnnotationData);
+        annotatorAreaOrdered = sortJsObject(combinedAnnotationData);
+        var keyNames = annotatorAreaOrdered[1];
+        keyNames = keyNames.reverse();
         for (var i=0; i<keyNames.length; i++) {
             if (keyNames[i].indexOf("area") != -1) {continue;}
             var polygonPointString = combinedAnnotationData[keyNames[i]];
