@@ -110,6 +110,7 @@ function plotPointsOnImage(polygonPoints, count){
          .attr('points', polygonPoints)
          .attr('class', 'polygons'+' '+user)
          .on("mouseover", function() {
+            //this can be changed to set fill-opacity: 0 for all polygons, but have full stroke for current polygon
             userclass = this.className['baseVal'].replace("polygons ", '');
             $('.'+userclass).attr("style", "fill: blue; stroke: black");
         })
