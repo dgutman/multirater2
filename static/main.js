@@ -48,6 +48,39 @@ $(document).ready(function() {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
         }
     });
+    d3.select('#main_svg')
+      .append('svg')
+      .attr('id', 'newg')
+
+    d3.select('#newg').append('text')
+        .text("Number of Raters at Point: ")
+        .attr('id', 'numRatersText')
+        .attr('class', 'ratersInfo')
+        .attr('x', '2%')
+        .attr('y', '9%')
+        .attr('fill', 'black')
+        .attr('display', 'none')
+        .attr('font-size', '14px')
+
+    d3.select('#newg').append('text')
+        .text(" ")
+        .attr('id', 'numRatersNum')
+        .attr('class', 'ratersInfo')
+        .attr('x', '18%')
+        .attr('y', '9%')
+        .attr('fill', 'black')
+        .attr('display', 'none')
+
+    d3.select('#newg').append('text')
+        .text("User VDSM")
+        .attr('id', 'userSelectedText')
+        .attr('x', '2%')
+        .attr('y', '95%')
+        .attr('fill', 'black')
+        .attr('font-size', '14px')
+        .attr('display', 'none')
+
+
 })
 
 function activateLoader() {
@@ -110,9 +143,14 @@ function plotPointsOnImage(polygonPoints, count){
          .attr('points', polygonPoints)
          .attr('class', 'polygons'+' '+user)
          .on("mouseover", function() {
+            $('.ratersInfo').attr("style", "display: block;")
+            $('#userSelectedText').attr("style", "display: block;")
             //this can be changed to set fill-opacity: 0 for all polygons, but have full stroke for current polygon
             userclass = this.className['baseVal'].replace("polygons ", '');
-            $('.'+userclass).attr("style", "fill: blue; stroke: black");
+            //$('.'+userclass).attr("style", "fill: blue; stroke: black");
+            $('.polygons').attr("style", "fill: lightblue; fill-opacity:0; stroke: none");
+            $('.'+userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
+            $('#userSelectedText')[0].innerHTML = userclass.replace("User", "User ");
         })
          .on("mousemove", function(){
             timer = setTimeout(function(){
@@ -122,14 +160,15 @@ function plotPointsOnImage(polygonPoints, count){
                     var arr = makeArr(polys[i]);
                     numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
                 }
-                console.log(numRaters);
+                $('#numRatersNum')[0].innerHTML = numRaters;
             }, 600);
          })
          .on("mouseout", function() {
             userclass = this.className['baseVal'].replace("polygons ", '');
-            $('.'+userclass).attr("style", "fill: lightblue; stroke: none");
+            $('.polygons').attr("style", "fill: lightblue; fill-opacity:1; stroke: none");
             clearTimeout(timer);
             numRaters = 0;
+            $('#userSelectedText')[0].innerHTML = "";
         })
 }
 
