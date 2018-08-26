@@ -92,7 +92,7 @@
 .polygons {
     mix-blend-mode: multiply;
     stroke: none;
-    stroke-width: 2px;
+    stroke-width: 4px;
     fill: lightgray;
 /*    isolation: isolate; */
 }

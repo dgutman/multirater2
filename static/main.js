@@ -102,20 +102,18 @@ function getFeatureList(studyId, imageId) {
     return featureList;
 }
 
-function plotPointsOnImage(polygonPoints, color){
+function plotPointsOnImage(polygonPoints, count){
+    //var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
+    var user = annotatorAreaOrdered[2][count].replace(/ /g,'');
     var img_g = d3.select('#inner-g');
     img_g.append('polygon')
          .attr('points', polygonPoints)
-         .attr('class', 'polygons')
+         .attr('class', 'polygons'+' '+user)
          .on("mouseover", function() {
-            console.log(this);
-            d3.select(this)
-                .attr("style", "fill: cyan; stroke: black");
-
+            userclass = this.className['baseVal'].replace("polygons ", '');
+            $('.'+userclass).attr("style", "fill: cyan; stroke: black");
         })
          .on("mousemove", function(){
-            //polygonTemp = this;
-            //numRaters = 0;
             timer = setTimeout(function(){
                 numRaters = 0;
                 var polys = $('.polygons');
@@ -124,13 +122,11 @@ function plotPointsOnImage(polygonPoints, color){
                     numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
                 }
                 console.log(numRaters);
-               //numRaters = 0;
             }, 600);
-
          })
          .on("mouseout", function() {
-            d3.select(this)
-                .attr("style", "fill: lightgray; stroke: none");
+            userclass = this.className['baseVal'].replace("polygons ", '');
+            $('.'+userclass).attr("style", "fill: lightgray; stroke: none");
             clearTimeout(timer);
             numRaters = 0;
         })
@@ -168,25 +164,27 @@ function displayAnnotation(selectedFeature){
         console.log(combinedAnnotationData);
         origImgWidth = multiraterMatrix['width'];
         origImgHeight = multiraterMatrix['height'];
-        var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
+        
         //var keyNames = Object.keys(combinedAnnotationData);
         annotatorAreaOrdered = sortJsObject(combinedAnnotationData);
-        var keyNames = annotatorAreaOrdered[1];
-        keyNames = keyNames.reverse();
-        for (var i=0; i<keyNames.length; i++) {
-            if (keyNames[i].indexOf("area") != -1) {continue;}
-            var polygonPointString = combinedAnnotationData[keyNames[i]];
-            polygonPointJson = JSON.parse(polygonPointString);
-            for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
-                polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]];
-                if (polygonPoints.length > 10) {
-                    plotPointsOnImage(polygonPoints, colors[i%5]);
+        getUsersFromAnnotationIds().then(function(){
+            var keyNames = annotatorAreaOrdered[1];
+                keyNames = keyNames.reverse();
+                for (var i=0; i<keyNames.length; i++) {
+                    if (keyNames[i].indexOf("area") != -1) {continue;}
+                    var polygonPointString = combinedAnnotationData[keyNames[i]];
+                    polygonPointJson = JSON.parse(polygonPointString);
+                    for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
+                        polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]];
+                        if (polygonPoints.length > 10) {
+                            plotPointsOnImage(polygonPoints, i);
+                        }
+                    }
                 }
-            }
-        }
-        getUsers();
-        d3.select('#loadingDiv').attr("style", "display:none");
-    })
+
+                d3.select('#loadingDiv').attr("style", "display:none");
+            })
+        })
 }
 
 function plotSegmentation(imageId) {
@@ -235,6 +233,14 @@ function getUsersFromAnnotationIds() {
         url: "http://localhost:8080/usersFromAnnotation",
         data: annotatorAreaOrdered[1]
     }).then(function(response) {
+        data = response.data;
+        data = data.split(",");
+        for (var i=0; i<data.length; i++) {
+            data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
+        }
+        console.log(data);
+        annotatorAreaOrdered[annotatorAreaOrdered.length] = data;
+
         return response.data;
     });
     return usernames;
