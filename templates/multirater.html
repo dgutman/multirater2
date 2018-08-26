@@ -45,17 +45,22 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div id="annotatorInfo">
-                    <p class="infoHeader">Annotator Information</p>
+                    <p class="infoHeader">Annotators For This Feature</p>
                 </div>
             </div>
-            <div class="col-md-4" >
-                <div id="annotationStatistics">
-                    <p class="infoHeader">Annotation Statistics</p>
+            <div class="col-md-3" >
+                <div id="annotationColors">
+                    <p class="infoHeader">Color Information</p>
                  </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div id="clinicalInformation">
+                    <p class="infoHeader">Annotation Statistics</p>
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div id="clinicalInformation">
                     <p class="infoHeader">Clinical Information</p>
                 </div>
@@ -71,9 +76,10 @@
     <script type="text/javascript" src="{{url_for('static', filename='main.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='selectBox.js')}}"></script>
     <script src="{{url_for('static', filename='axios.min.js')}}"></script>
+    <script src="{{url_for('static', filename='easyTable.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/selectBoxStyle.css')}}">
-
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/easyTable.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/prettydropdowns.css')}}">
     <script src="{{url_for('static', filename='jquery.prettydropdowns.js')}}"></script>
     <script src="{{url_for('static', filename='watch.min.js')}}"></script>

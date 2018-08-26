@@ -53,8 +53,9 @@ $(document).ready(function() {
 })
 
 function addAnnotatorInfo() {
-    $('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
-    content = '<table>';
+    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
+    $('#userTable').remove()
+    content = '<table id="userTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
         content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + annotatorAreaOrdered[2][i] + '</td></tr>';
         //table.append(row);
@@ -68,6 +69,31 @@ function addAnnotatorInfo() {
             $('.'+userClass).toggle();
         })
     }
+}
+
+function addColorTable() {
+    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
+    $('#colorTable').remove()
+    content = '<table id="colorTable">';
+    for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
+        if (i==0) {
+            annotatorstxt = "1 Annotator";
+        } else {
+            annotatorstxt = (i+1)+" Annotators";
+        }
+
+        divStr = ""
+        for(var j = 0; j<i+1; j++) {
+            divStr = divStr + "<span class='colorBox'></span>";
+        }
+
+        content = content + '<tr>' + "<td class='userColor'>"+divStr+"</td><td class='spacer'><span class='spacerspan'></span></td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
+        //table.append(row);
+    }
+    content = content + '</table>';
+    $('#annotationColors').append(content);
+
+
 }
 
 function addViewerInfo() {
@@ -291,6 +317,13 @@ function displayAnnotation(selectedFeature) {
                 }
             }
             d3.select('#loadingDiv').attr("style", "display:none");
+            addAnnotatorInfo();
+            addColorTable();
+            $('#userTable').easyTable();
+            $('#easyMenuTable').remove();
+            $('#colorTable').easyTable();
+            $('#easyMenuTable').remove();
+
         })
     })
 }

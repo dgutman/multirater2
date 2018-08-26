@@ -91,6 +91,8 @@
 
 .polygons {
     mix-blend-mode: multiply;
+    stroke-width: 4px;
+    fill: lightblue;
 /*    fill-opacity: 1; */
 }
 
@@ -101,4 +103,31 @@
 .infoHeader {
     text-align: center;
 }
+
+.colorBox {
+    height: 24px;
+    width: 24px;
+    background-color: lightblue;
+    position: absolute;
+    mix-blend-mode: multiply;
+    border: black;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.spacerspan {
+    width: 30px;
+    height: 5px;
+    background-color: white;
+    opacity: 0;
+}
+
+.colorInfoAnnotator {
+
+}
+
+#colorTable {
+
+}
+
 
