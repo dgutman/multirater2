@@ -184,6 +184,7 @@ function displayAnnotation(selectedFeature){
                 }
             }
         }
+        getUsers();
         d3.select('#loadingDiv').attr("style", "display:none");
     })
 }
@@ -225,6 +226,31 @@ function getSegmentationArea(imageId) {
         return response.data;
     });
     return segArea;
+}
+
+function getUsersFromAnnotationIds() {
+    var usernames = {};
+    usernames = axios({
+        method: 'post',
+        url: "http://localhost:8080/usersFromAnnotation",
+        data: annotatorAreaOrdered[1]
+    }).then(function(response) {
+        return response.data;
+    });
+    return usernames;
+}
+
+function getUsers() {
+    getUsersFromAnnotationIds().then(function(data){
+        //console.log(data);
+        //console.log(JSON.parse(data));
+        data = data.split(",");
+        for (var i=0; i<data.length; i++) {
+            data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
+        }
+        console.log(data);
+        annotatorAreaOrdered[annotatorAreaOrdered.length] = data;
+    })
 }
 
 function displayImage(imageId) {

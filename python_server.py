@@ -136,6 +136,20 @@ def retrieveSegmentationArea(image_id):
 	area = json.dumps(area[0].size)
 	return area
 
+@app.route("/usersFromAnnotation", methods=['POST'])
+def getUsersFromAnnotation():
+	req_data = request.get_json()
+	#print(type(req_data))
+	usernames = []
+	for i in range(0, len(req_data)):
+		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+req_data[i]
+		resp = urllib.request.urlopen(url)
+		resp = resp.read().decode('utf-8')
+		user_name = json.loads(resp)['user']['name']
+		usernames.append(user_name)
+	return str(usernames)
+
+
 @app.route("/studyList")
 def retrieveStudyList():
 	url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
