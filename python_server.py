@@ -151,6 +151,14 @@ def getUsersFromAnnotation():
 		usernames.append(user_name)
 	return str(usernames)
 
+@app.route("/imageDetails/<image_id>")
+def retrieveImageDetails(image_id):
+	url = BASE_URL + ISIC_IMAGE_ENDPOINT + '/' + image_id
+	imageDetails = retrieveData(url)
+	imageDetails_min = imageDetails['meta']['clinical']
+	imageDetails_min['image_type'] = imageDetails['meta']['acquisition']['image_type']
+	print(imageDetails_min);
+	return imageDetails_min
 
 @app.route("/studyList")
 def retrieveStudyList():

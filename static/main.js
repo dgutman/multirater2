@@ -23,6 +23,9 @@ var polygonTemp;
 var numRaters;
 var annotatorAreaOrdered;
 
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+
 $(document).ready(function() {
     var gtoken = '';
     var config = '';
@@ -69,6 +72,8 @@ function addAnnotatorInfo() {
             $('.'+userClass).toggle();
         })
     }
+    $('#userTable').easyTable();
+    $('#easyMenuTable').remove();
 }
 
 function addColorTable() {
@@ -92,7 +97,37 @@ function addColorTable() {
     }
     content = content + '</table>';
     $('#annotationColors').append(content);
+    $('#colorTable').easyTable();
+    $('#easyMenuTable').remove();
+}
 
+function addStatsTable() {
+    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
+    raterNumbers = multiraterMatrix;
+    delete raterNumbers['height'];
+    delete raterNumbers['width'];
+    raterNumbers = Object.values(raterNumbers);
+
+    $('#statsTable').remove();
+
+    content = '<table id="statsTable">';
+    for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
+        numraters = i + 1;
+        ratertxt = numraters;
+        rater_plus_txt = "&ge;"+numraters;
+        i_rater_agreement = (raterNumbers[0]/segmentationArea)*100;
+        i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2)+"%";
+        i_plus_rater_agreement = (Object.values(raterNumbers).reduce(reducer)/segmentationArea)*100;
+        i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2)+"%";
+
+        content = content + '<tr>' + "<td class='raterNum'>"+ratertxt+"</td><td class='calculation'>" + i_rater_agreement + '</td>'+"<td class='raterNum'>"+rater_plus_txt+"</td><td class='calculation'>" + i_plus_rater_agreement + '</td>'+'</tr>';
+        //table.append(row);
+        raterNumbers.shift();
+    }
+    content = content + '</table>';
+    $('#statsInformation').append(content);
+    $('#statsTable').easyTable();
+    $('#easyMenuTable').remove();
 
 }
 
@@ -319,11 +354,8 @@ function displayAnnotation(selectedFeature) {
             d3.select('#loadingDiv').attr("style", "display:none");
             addAnnotatorInfo();
             addColorTable();
-            $('#userTable').easyTable();
-            $('#easyMenuTable').remove();
-            $('#colorTable').easyTable();
-            $('#easyMenuTable').remove();
-
+            addStatsTable();
+            $('#hiddenTables').attr("style", "display: flex");
         })
     })
 }
@@ -400,10 +432,39 @@ function getUsers() {
     })
 }
 
+function getClinicalInfo(imageId) {
+    var info = {};
+    info = axios({
+        method: 'get',
+        url: "http://localhost:8080/imageDetails/" + imageId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return info;
+}
+
+function displayClinicalTable(imageId){
+    getClinicalInfo(imageId).then(function(data){
+        $('#clinicalTable').remove()
+        content = '<table id="clinicalTable">';
+        for (var i = 0; i < Object.keys(data).length; i++) {
+            if (Object.values(data)[i] == null) {continue;}
+            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(data)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(data)[i] + '</td></tr>';
+            //table.append(row);
+        }
+        content = content + '</table>';
+        $('#clinicalInformation').append(content);
+
+        $('#clinicalTable').easyTable();
+        $('#easyMenuTable').remove();
+    })
+}
+
 function displayImage(imageId) {
     //if ($('#viewer').children().first().length > 0) {
     $('#svgImage').remove();
     $('polygon').remove();
+    $('#hiddenTables').attr("style", "display: none");
     //}
     var svg = d3.select("#outer-g")
     svg.insert("svg:image", "#inner-g")
@@ -422,6 +483,7 @@ function displayImage(imageId) {
         //console.log(unscaledCoords);
     });
     plotSegmentation(imageId);
+    displayClinicalTable(imageId);
 
 }
 

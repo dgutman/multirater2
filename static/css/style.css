@@ -122,12 +122,14 @@
     opacity: 0;
 }
 
-.colorInfoAnnotator {
-
+#statsNote {
+    font-size: 10px;
+    position: absolute;
+    top: 18px;
 }
 
-#colorTable {
-
+#hiddenTables {
+    display: none;
 }
 
 
