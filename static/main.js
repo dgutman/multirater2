@@ -56,12 +56,10 @@ $(document).ready(function() {
 })
 
 function addAnnotatorInfo() {
-    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
     $('#userTable').remove()
     content = '<table id="userTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
         content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + annotatorAreaOrdered[2][i] + '</td></tr>';
-        //table.append(row);
     }
     content = content + '</table>';
     $('#annotatorInfo').append(content);
@@ -77,7 +75,6 @@ function addAnnotatorInfo() {
 }
 
 function addColorTable() {
-    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
     $('#colorTable').remove()
     content = '<table id="colorTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
@@ -92,8 +89,7 @@ function addColorTable() {
             divStr = divStr + "<span class='colorBox'></span>";
         }
 
-        content = content + '<tr>' + "<td class='userColor'>"+divStr+"</td><td class='spacer'><span class='spacerspan'></span></td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
-        //table.append(row);
+        content = content + '<tr>' + "<td class='userColor'>"+divStr+"</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
     }
     content = content + '</table>';
     $('#annotationColors').append(content);
@@ -102,7 +98,6 @@ function addColorTable() {
 }
 
 function addStatsTable() {
-    //$('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
     raterNumbers = multiraterMatrix;
     delete raterNumbers['height'];
     delete raterNumbers['width'];
@@ -121,7 +116,6 @@ function addStatsTable() {
         i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2)+"%";
 
         content = content + '<tr>' + "<td class='raterNum'>"+ratertxt+"</td><td class='calculation'>" + i_rater_agreement + '</td>'+"<td class='raterNum'>"+rater_plus_txt+"</td><td class='calculation'>" + i_plus_rater_agreement + '</td>'+'</tr>';
-        //table.append(row);
         raterNumbers.shift();
     }
     content = content + '</table>';
@@ -170,7 +164,6 @@ function activateLoader() {
     var imgViewer = d3.select('#viewer');
     imgViewer.append('div')
         .attr("id", "loadingDiv")
-
     var loadingDiv = d3.select('#loadingDiv');
     loadingDiv.append('img')
         .attr("id", "loadingImg")
@@ -180,8 +173,6 @@ function activateLoader() {
 function getAnnotationData(studyId, imageId, feature) {
     if (feature != "") {
         var annotationMaskData = {};
-        //feature = feature.replace("/", "%2F")
-        //console.log(feature);
         annotationMaskData = axios({
             method: 'get',
             url: "http://localhost:8080/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
@@ -219,7 +210,6 @@ function getFeatureList(studyId, imageId) {
 }
 
 function plotPointsOnImage(polygonPoints, count) {
-    //var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
     var user = annotatorAreaOrdered[2][count].replace(/ /g, '');
     var img_g = d3.select('#inner-g');
     img_g.append('polygon')
@@ -228,10 +218,7 @@ function plotPointsOnImage(polygonPoints, count) {
         .on("mouseover", function() {
             $('.ratersInfo').attr("style", "display: block;")
             $('#userSelectedText').attr("style", "display: block;")
-            //this can be changed to set fill-opacity: 0 for all polygons, but have full stroke for current polygon
             userclass = this.className['baseVal'].replace("polygons ", '');
-            //$('.'+userclass).attr("style", "fill: blue; stroke: black");
-            //$('.polygons').attr("style", "fill-opacity:0;");
             allPolys = $('.polygons');
             for(var i=0; i<allPolys.length; i++) {
                     var polygon = allPolys[i];
@@ -242,12 +229,8 @@ function plotPointsOnImage(polygonPoints, count) {
                         continue;
                     } else {
                         polygon.style.fillOpacity = 0;
-                        //polygon.style.stroke = 'black';
                     }
-
             }
-
-
             $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
             $('#userSelectedText')[0].innerHTML = userclass.replace("User", "User ");
         })
@@ -265,17 +248,6 @@ function plotPointsOnImage(polygonPoints, count) {
         .on("mouseout", function() {
             userclass = this.className['baseVal'].replace("polygons ", '');
             display_arr = [];
-/*            for (var i=0; i<annotatorAreaOrdered[2].length; i++) {
-                var uc = annotatorAreaOrdered[2][i].replace(/ /g, '');
-                display_status = $('.'+uc)[0].style.display;
-                display_arr.push(display_status);
-            }
-            console.log(display_arr);
-            $('.'+userclass).attr("style", "fill: lightblue; fill-opacity:1; stroke: none");
-            for (var i=0; i<annotatorAreaOrdered[2].length; i++) {
-                var uc = annotatorAreaOrdered[2][i].replace(/ /g, '');
-                $('.'+uc)[0].style.display = display_arr[i];
-            }*/
             allPolys = $('.polygons');
             for(var i=0; i<allPolys.length; i++) {
                     var polygon = allPolys[i];
@@ -289,7 +261,6 @@ function plotPointsOnImage(polygonPoints, count) {
                         polygon.style.stroke = 'none';
                         polygon.style.fill = 'lightblue';
                     }
-
             }
             clearTimeout(timer);
             numRaters = 0;

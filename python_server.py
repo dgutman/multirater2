@@ -56,7 +56,6 @@ def retrieveData(url):
 @app.route("/annotationMasks/<study_id>/<image_id>/<feature>")
 def retrieveAnnotationMasks(study_id, image_id, feature):
 	feature2 = urllib.parse.quote(feature.replace("_", "%2F"))
-	print(feature2)
 	combined_pixel_data = {}
 	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'?studyId='+study_id+'&imageId='+image_id+'&state=complete' #create url for ISIC annotation mask endpoint
 	annotationData = retrieveData(url)
@@ -64,7 +63,6 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 	counter = 0
 	for annotation_id in annotation_ids:
 		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+"/"+annotation_id+"/"+feature2+"/mask"
-		print(url)
 		image = url_to_image(url) #get image
 		contour_data = getContours(image, segmentation=False) #get contours
 		area = np.where(image != 0)
@@ -89,7 +87,6 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 	for i in range(1, counter+1):
 		ind = np.where(img_matrix_flat == i)
 		ind = ind[0].size
-		print(ind)
 		img_matrix_fl[str(i)+' rater'] = ind
 	img_matrix_json = json.dumps(img_matrix_fl)
 	combined_pixel_data['multiraterMatrix'] = img_matrix_json
@@ -141,7 +138,6 @@ def retrieveSegmentationArea(image_id):
 @app.route("/usersFromAnnotation", methods=['POST'])
 def getUsersFromAnnotation():
 	req_data = request.get_json()
-	#print(type(req_data))
 	usernames = []
 	for i in range(0, len(req_data)):
 		url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+req_data[i]
@@ -158,7 +154,6 @@ def retrieveImageDetails(image_id):
 	imageDetails_min = imageDetails['meta']['clinical']
 	imageDetails_min['image_type'] = imageDetails['meta']['acquisition']['image_type']
 	imageDetails_min.pop('melanocytic', None)
-	print(imageDetails_min);
 	return imageDetails_min
 
 @app.route("/studyList")
