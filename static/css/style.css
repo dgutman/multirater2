@@ -91,13 +91,14 @@
 
 .polygons {
     mix-blend-mode: multiply;
-    stroke: none;
-    stroke-width: 4px;
-    fill: lightblue;
 /*    fill-opacity: 1; */
 }
 
 #inner-g {
     isolation: isolate;
+}
+
+.infoHeader {
+    text-align: center;
 }
 

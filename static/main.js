@@ -34,7 +34,7 @@ $(document).ready(function() {
         .call(d3.zoom().on("zoom", function() {
             svg.attr("transform", d3.event.transform)
         }).scaleExtent([0.1, 10]))
-       .append("g").attr("id", "outer-g")
+        .append("g").attr("id", "outer-g")
     d3.select("#outer-g").append("g").attr("id", "inner-g")
     displayImage('558d6301bae47801cf734ad1');
     activateLoader();
@@ -42,15 +42,38 @@ $(document).ready(function() {
     activateSelect('imageSelector', 'Select an Image');
     activateSelect('featureSelector', 'Select a Feature');
     createStudyMenu();
-    $('#featureSelector').change(function(){
-        selectedFeature = this.value.substring(0,this.value.lastIndexOf(' '));
+    $('#featureSelector').change(function() {
+        selectedFeature = this.value.substring(0, this.value.lastIndexOf(' '));
         if (selectedFeature != "") {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
         }
     });
+    addViewerInfo();
+
+})
+
+function addAnnotatorInfo() {
+    $('#annotatorInfo').append("<p>Annotators For This Feature: </p>");
+    content = '<table>';
+    for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
+        content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + annotatorAreaOrdered[2][i] + '</td></tr>';
+        //table.append(row);
+    }
+    content = content + '</table>';
+    $('#annotatorInfo').append(content);
+
+    for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
+        $($('#annotatorInfo input')[i]).change(function() {
+            userClass = $(this).parent()[0].className.replace('Checkbox', '');
+            $('.'+userClass).toggle();
+        })
+    }
+}
+
+function addViewerInfo() {
     d3.select('#main_svg')
-      .append('svg')
-      .attr('id', 'newg')
+        .append('svg')
+        .attr('id', 'newg')
 
     d3.select('#newg').append('text')
         .text("Number of Raters at Point: ")
@@ -80,18 +103,17 @@ $(document).ready(function() {
         .attr('font-size', '14px')
         .attr('display', 'none')
 
-
-})
+}
 
 function activateLoader() {
     var imgViewer = d3.select('#viewer');
     imgViewer.append('div')
-             .attr("id", "loadingDiv")
+        .attr("id", "loadingDiv")
 
     var loadingDiv = d3.select('#loadingDiv');
     loadingDiv.append('img')
-              .attr("id", "loadingImg")
-              .attr("src", "http://gifimage.net/wp-content/uploads/2017/09/ajax-loading-gif-transparent-background-8.gif")
+        .attr("id", "loadingImg")
+        .attr("src", "http://gifimage.net/wp-content/uploads/2017/09/ajax-loading-gif-transparent-background-8.gif")
 }
 
 function getAnnotationData(studyId, imageId, feature) {
@@ -101,23 +123,23 @@ function getAnnotationData(studyId, imageId, feature) {
         //console.log(feature);
         annotationMaskData = axios({
             method: 'get',
-            url: "http://localhost:8080/annotationMasks/"+studyId+"/"+imageId+"/"+feature,
+            url: "http://localhost:8080/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
         }).then(function(response) {
             return response.data;
 
         });
     }
-        return annotationMaskData;
+    return annotationMaskData;
 
 }
 
 function createFeatureMenu() { //need to clear feature menu
     $('#featureSelector').children().remove();
     var featureListTmp = [];
-    getFeatureList(selectedStudyId, selectedImageId).then(function(data){
+    getFeatureList(selectedStudyId, selectedImageId).then(function(data) {
         featureData = data;
         $.each(featureData, function(x) {
-            featureListTmp.push(x + " ["+featureData[x].length+"]");
+            featureListTmp.push(x + " [" + featureData[x].length + "]");
         });
         featureList = featureListTmp;
         addOptions('featureSelector', featureList, 'Select a Feature');
@@ -128,44 +150,86 @@ function getFeatureList(studyId, imageId) {
     var featureList = {};
     featureList = axios({
         method: 'get',
-        url: "http://localhost:8080/featuresForStudyImage/"+studyId+'/'+imageId,
+        url: "http://localhost:8080/featuresForStudyImage/" + studyId + '/' + imageId,
     }).then(function(response) {
         return response.data;
     });
     return featureList;
 }
 
-function plotPointsOnImage(polygonPoints, count){
+function plotPointsOnImage(polygonPoints, count) {
     //var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
-    var user = annotatorAreaOrdered[2][count].replace(/ /g,'');
+    var user = annotatorAreaOrdered[2][count].replace(/ /g, '');
     var img_g = d3.select('#inner-g');
     img_g.append('polygon')
-         .attr('points', polygonPoints)
-         .attr('class', 'polygons'+' '+user)
-         .on("mouseover", function() {
+        .attr('points', polygonPoints)
+        .attr('class', 'polygons' + ' ' + user)
+        .on("mouseover", function() {
             $('.ratersInfo').attr("style", "display: block;")
             $('#userSelectedText').attr("style", "display: block;")
             //this can be changed to set fill-opacity: 0 for all polygons, but have full stroke for current polygon
             userclass = this.className['baseVal'].replace("polygons ", '');
             //$('.'+userclass).attr("style", "fill: blue; stroke: black");
-            $('.polygons').attr("style", "fill: lightblue; fill-opacity:0; stroke: none");
-            $('.'+userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
+            //$('.polygons').attr("style", "fill-opacity:0;");
+            allPolys = $('.polygons');
+            for(var i=0; i<allPolys.length; i++) {
+                    var polygon = allPolys[i];
+                    //console.log(polygon);
+                    display_status = polygon.style.display;
+                    if (display_status == 'none') {
+                        console.log('nonez');
+                        continue;
+                    } else {
+                        polygon.style.fillOpacity = 0;
+                        //polygon.style.stroke = 'black';
+                    }
+
+            }
+
+
+            $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
             $('#userSelectedText')[0].innerHTML = userclass.replace("User", "User ");
         })
-         .on("mousemove", function(){
-            timer = setTimeout(function(){
+        .on("mousemove", function() {
+            timer = setTimeout(function() {
                 numRaters = 0;
                 var polys = $('.polygons');
-                for(var i=0; i<polys.length; i++) {
+                for (var i = 0; i < polys.length; i++) {
                     var arr = makeArr(polys[i]);
                     numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
                 }
                 $('#numRatersNum')[0].innerHTML = numRaters;
             }, 600);
-         })
-         .on("mouseout", function() {
+        })
+        .on("mouseout", function() {
             userclass = this.className['baseVal'].replace("polygons ", '');
-            $('.polygons').attr("style", "fill: lightblue; fill-opacity:1; stroke: none");
+            display_arr = [];
+/*            for (var i=0; i<annotatorAreaOrdered[2].length; i++) {
+                var uc = annotatorAreaOrdered[2][i].replace(/ /g, '');
+                display_status = $('.'+uc)[0].style.display;
+                display_arr.push(display_status);
+            }
+            console.log(display_arr);
+            $('.'+userclass).attr("style", "fill: lightblue; fill-opacity:1; stroke: none");
+            for (var i=0; i<annotatorAreaOrdered[2].length; i++) {
+                var uc = annotatorAreaOrdered[2][i].replace(/ /g, '');
+                $('.'+uc)[0].style.display = display_arr[i];
+            }*/
+            allPolys = $('.polygons');
+            for(var i=0; i<allPolys.length; i++) {
+                    var polygon = allPolys[i];
+                    //console.log(polygon);
+                    display_status = polygon.style.display;
+                    if (display_status == 'none') {
+                        console.log('nonez');
+                        continue;
+                    } else {
+                        polygon.style.fillOpacity = 1;
+                        polygon.style.stroke = 'none';
+                        polygon.style.fill = 'lightblue';
+                    }
+
+            }
             clearTimeout(timer);
             numRaters = 0;
             $('#userSelectedText')[0].innerHTML = "";
@@ -176,7 +240,7 @@ function makeArr(polygonTemp) {
     thisPoints = d3.select(polygonTemp).attr('points');
     x = thisPoints.split(" ");
     arr = [];
-    for (i=0; i<x.length; i++) {
+    for (i = 0; i < x.length; i++) {
         arr_tmp = [];
         splitt = x[i].split(",");
         arr_tmp.push(parseInt(splitt[0]));
@@ -186,19 +250,19 @@ function makeArr(polygonTemp) {
     return arr;
 }
 
-function trimFirstLast(string){
+function trimFirstLast(string) {
     var string = string.substring(1)
     string = string.substring(0, string.length - 2);
     return string
 }
 
-function displayAnnotation(selectedFeature){
+function displayAnnotation(selectedFeature) {
     //var polygonPoints;
     annotatorAreaOrdered = [];
     $('#inner-g').children().remove();
     console.log(selectedFeature);
     d3.select('#loadingDiv').attr("style", "display:block");
-    getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
+    getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data) {
         annotatorAreaOrdered = [];
         combinedAnnotationData = data;
         multiraterMatrix = JSON.parse(data['multiraterMatrix']);
@@ -206,41 +270,43 @@ function displayAnnotation(selectedFeature){
         console.log(combinedAnnotationData);
         origImgWidth = multiraterMatrix['width'];
         origImgHeight = multiraterMatrix['height'];
-        
+
         //var keyNames = Object.keys(combinedAnnotationData);
         annotatorAreaOrdered = sortJsObject(combinedAnnotationData);
-        getUsersFromAnnotationIds().then(function(){
+        getUsersFromAnnotationIds().then(function() {
             var keyNames = annotatorAreaOrdered[1];
-                keyNames = keyNames.reverse();
-                for (var i=0; i<keyNames.length; i++) {
-                    if (keyNames[i].indexOf("area") != -1) {continue;}
-                    //if (annotatorAreaOrdered[0][i] != "0") {continue;}
-                    var polygonPointString = combinedAnnotationData[keyNames[i]];
-                    polygonPointJson = JSON.parse(polygonPointString);
-                    for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
-                        polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]];
-                        if (polygonPoints.length > 10) {
-                            plotPointsOnImage(polygonPoints, i);
-                        }
+            keyNames = keyNames.reverse();
+            for (var i = 0; i < keyNames.length; i++) {
+                if (keyNames[i].indexOf("area") != -1) {
+                    continue;
+                }
+                //if (annotatorAreaOrdered[0][i] != "0") {continue;}
+                var polygonPointString = combinedAnnotationData[keyNames[i]];
+                polygonPointJson = JSON.parse(polygonPointString);
+                for (var j = 0; j < Object.keys(polygonPointJson).length; j++) {
+                    polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]];
+                    if (polygonPoints.length > 10) {
+                        plotPointsOnImage(polygonPoints, i);
                     }
                 }
-                d3.select('#loadingDiv').attr("style", "display:none");
-            })
+            }
+            d3.select('#loadingDiv').attr("style", "display:none");
         })
+    })
 }
 
 function plotSegmentation(imageId) {
     var polygonPoints;
-    getSegmentationData(imageId).then(function(data){
+    getSegmentationData(imageId).then(function(data) {
         polygonPoints = data[0];
         var img_g = d3.select('g');
         img_g.append('polygon')
-             .attr('points', polygonPoints)
-             .style("fill", "none")
-             .style("stroke", "green")
-             .style("stroke-width", "4px");
+            .attr('points', polygonPoints)
+            .style("fill", "none")
+            .style("stroke", "green")
+            .style("stroke-width", "4px");
     })
-    getSegmentationArea(imageId).then(function(data){
+    getSegmentationArea(imageId).then(function(data) {
         segmentationArea = data;
     })
     createFeatureMenu();
@@ -250,7 +316,7 @@ function getSegmentationData(imageId) {
     var segData = {};
     segData = axios({
         method: 'get',
-        url: "http://localhost:8080/segmentation/"+imageId,
+        url: "http://localhost:8080/segmentation/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -261,7 +327,7 @@ function getSegmentationArea(imageId) {
     var segArea = {};
     segArea = axios({
         method: 'get',
-        url: "http://localhost:8080/segmentationArea/"+imageId,
+        url: "http://localhost:8080/segmentationArea/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -277,7 +343,7 @@ function getUsersFromAnnotationIds() {
     }).then(function(response) {
         data = response.data;
         data = data.split(",");
-        for (var i=0; i<data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
             data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
         }
         console.log(data);
@@ -289,11 +355,11 @@ function getUsersFromAnnotationIds() {
 }
 
 function getUsers() {
-    getUsersFromAnnotationIds().then(function(data){
+    getUsersFromAnnotationIds().then(function(data) {
         //console.log(data);
         //console.log(JSON.parse(data));
         data = data.split(",");
-        for (var i=0; i<data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
             data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
         }
         console.log(data);
@@ -308,9 +374,9 @@ function displayImage(imageId) {
     //}
     var svg = d3.select("#outer-g")
     svg.insert("svg:image", "#inner-g")
-        .attr("xlink:href", "https://isic-archive.com/api/v1/image/"+imageId+"/download?contentDisposition=inline")
+        .attr("xlink:href", "https://isic-archive.com/api/v1/image/" + imageId + "/download?contentDisposition=inline")
         .attr('id', 'svgImage')
-        //.attr("transform", "translate(400,100) scale(0.25)")
+    //.attr("transform", "translate(400,100) scale(0.25)")
     d3.select('#main_svg').on("mousemove", function() {
         //setTimeout(getCoords(), 500);
         svgCoords = getCoords(this);
@@ -327,18 +393,18 @@ function displayImage(imageId) {
 }
 
 function getCoords(place) {
-      var coords = d3.mouse(place);
-      //currentImgWidth = document.getElementById('outer-g').getBoundingClientRect().width;
-      currentImgHeight = document.getElementById('outer-g').getBoundingClientRect().height;
-      //console.log(coords);
-      return coords;
+    var coords = d3.mouse(place);
+    //currentImgWidth = document.getElementById('outer-g').getBoundingClientRect().width;
+    currentImgHeight = document.getElementById('outer-g').getBoundingClientRect().height;
+    //console.log(coords);
+    return coords;
 }
 
 function getUnscaledCoords(svgCoords) {
     var t = d3.select('#outer-g').attr("transform");
 
     if (t != null) {
-        var tr = t.substring(t.indexOf("(")+1, t.indexOf(")")).split(",");
+        var tr = t.substring(t.indexOf("(") + 1, t.indexOf(")")).split(",");
         var x_translation = parseInt(tr[0]);
         var y_translation = parseInt(tr[1]);
     } else {
@@ -349,13 +415,13 @@ function getUnscaledCoords(svgCoords) {
     var scaled_x_location = svgCoords[0] - x_translation + 1;
     var scaled_y_location = svgCoords[1] - y_translation + 1;
 
-    var unscaled_x_location = (origImgHeight/currentImgHeight)*scaled_x_location;
-    var unscaled_y_location = (origImgHeight/currentImgHeight)*scaled_y_location;
+    var unscaled_x_location = (origImgHeight / currentImgHeight) * scaled_x_location;
+    var unscaled_y_location = (origImgHeight / currentImgHeight) * scaled_y_location;
 
     return [unscaled_x_location, unscaled_y_location];
 }
 
-function createStudyMenu(){
+function createStudyMenu() {
     var studyNamesTmp = [];
     getStudyList().then(function(data) {
         studies = data;
@@ -376,23 +442,23 @@ function createStudyMenu(){
     });
 }
 
-function createImageMenu(){
+function createImageMenu() {
     var imageListTmp = [];
-    getImageList(selectedStudyId).then(function(data){
+    getImageList(selectedStudyId).then(function(data) {
         studyData = data;
         $.each(studyData['images'], function(x) {
             imageListTmp.push(studyData['images'][x].name)
         });
         imageList = imageListTmp;
         addOptions('imageSelector', imageList, 'Select an Image');
-        $('#imageSelector').change(function(){
+        $('#imageSelector').change(function() {
             selectedImage = this.value;
-           $.each(studyData['images'], function(key, value) {
+            $.each(studyData['images'], function(key, value) {
                 if (value.name == selectedImage) {
                     selectedImageId = value['_id'];
                 }
             });
-           displayImage(selectedImageId);
+            displayImage(selectedImageId);
         })
     });
 }
@@ -408,7 +474,7 @@ function addOptions(elementId, selectValues, placeholderText) {
     $('#' + elementId).val(null).trigger('change');
 }
 
-function activateSelect(elementId, placeholderText){
+function activateSelect(elementId, placeholderText) {
     $('#' + elementId).select2({
         placeholder: {
             id: '-1', // the value of the option
@@ -458,41 +524,39 @@ function getImageList(studyId) {
     var imageList = {};
     imageList = axios({
         method: 'get',
-        url: "http://localhost:8080/imageList/"+studyId,
+        url: "http://localhost:8080/imageList/" + studyId,
     }).then(function(response) {
         return response.data;
     });
     return imageList;
 }
 
- function sortJsObject(dict) {
+function sortJsObject(dict) {
     var keys = [];
-    for(var key in dict) { 
-       if (key.indexOf("area") == -1) {
-          continue;
-       }
-       keys[keys.length] = key;
-     }
-     var values = [];     
-     for(var i = 0; i < keys.length; i++) {
-         values[values.length] = dict[keys [i]];
-     }
-     var sortedValues = values.sort(sortNumber);
-     var keyNames = [];
-     for(var i=0; i<sortedValues.length;i++){ 
+    for (var key in dict) {
+        if (key.indexOf("area") == -1) {
+            continue;
+        }
+        keys[keys.length] = key;
+    }
+    var values = [];
+    for (var i = 0; i < keys.length; i++) {
+        values[values.length] = dict[keys[i]];
+    }
+    var sortedValues = values.sort(sortNumber);
+    var keyNames = [];
+    for (var i = 0; i < sortedValues.length; i++) {
         keyNames[i] = getKeyByValue(dict, sortedValues[i]);
         keyNames[i] = keyNames[i].replace("_area", "");
-     }
-     return [sortedValues, keyNames];
+    }
+    return [sortedValues, keyNames];
 }
 
 // this is needed to sort values as integers
-function sortNumber(a,b) {
-   return a - b;
+function sortNumber(a, b) {
+    return a - b;
 }
 
 function getKeyByValue(object, value) {
-  return Object.keys(object).find(key => object[key] === value);
+    return Object.keys(object).find(key => object[key] === value);
 }
-
-
