@@ -47,14 +47,6 @@ def retrievePixelDataAsJson(contour_data):
 	json_data = json.dumps(pixel_data) #convert dictionary to json
 	return json_data #return data as json
 
-#@app.route("/annotation/<annotation_id>/<feature_id>/mask")
-#def retrieveAnnotationMask(annotation_id, feature_id):
-#	url = BASE_URL+ISIC_ANNOTATION_ENDPOINT+'/'+annotation_id+'/'+feature_id+'/mask' #create url for ISIC annotation mask endpoint
-#	image = url_to_image(url) #get image
-#	contour_data = getContours(image, segmentation=False) #get contours
-#	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
-#	return pixelJson
-
 def retrieveData(url):
 	resp = urllib.request.urlopen(url) #retrieve data
 	resp = resp.read().decode('utf-8') #parse data
@@ -75,18 +67,29 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
 		print(url)
 		image = url_to_image(url) #get image
 		contour_data = getContours(image, segmentation=False) #get contours
+		area = np.where(image != 0)
+		area = json.dumps(area[0].size)
+		#print(cv2.contourArea(contour_data))
 		pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
 		combined_pixel_data[annotation_id] = pixelJson
+		combined_pixel_data[annotation_id+'_area'] = area
 		if counter != 0:
 			img_matrix = np.add(img_matrix, image, dtype=np.float)
 		else:
 			img_matrix = image
+			img_h, img_w = image.shape[:2]
 		counter = counter + 1
 	img_matrix_flat = img_matrix.flatten()
 	img_matrix_flat = img_matrix_flat/255
-	ind = np.where(img_matrix_flat == 2)
-	img_matrix_fl = np.array(ind[0].flatten(), dtype=np.float)
-	img_matrix_json = json.dumps(list(img_matrix_fl))
+	img_matrix_fl = {}
+	img_matrix_fl['width'] = img_w
+	img_matrix_fl['height'] = img_h
+	for i in range(1, counter+1):
+		ind = np.where(img_matrix_flat == i)
+		ind = ind[0].size
+		print(ind)
+		img_matrix_fl[str(i)+' rater'] = ind
+	img_matrix_json = json.dumps(img_matrix_fl)
 	combined_pixel_data['multiraterMatrix'] = img_matrix_json
 	return combined_pixel_data
 
@@ -120,13 +123,18 @@ def retrieveSegmentationMask(image_id):
 	image = url_to_image(BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'/'+segmentation_id+'/'+'mask') #get image
 	contour_data = getContours(image, segmentation=True) #get contours
 	pixelJson = retrievePixelDataAsJson(contour_data) #convert to json
-	print(pixelJson[0])
-	#cv2.drawContours(image, contour_data, -1, (0,255,0), 3)
-	#cv2.imwrite("seg_img.jpg", image)
-	#f = open("demofile.txt", "w")
-	#f.write(str(contour_data))
-	#f.close()
 	return pixelJson
+
+@app.route("/segmentationArea/<image_id>")
+def retrieveSegmentationArea(image_id):
+	url = BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'?imageId='+image_id #create url for ISIC segmentation endpoint
+	resp = urllib.request.urlopen(url) #retrieve data
+	resp = resp.read().decode('utf-8') #parse data
+	segmentation_id = json.loads(resp)[0]['_id'] #retrieve segmentation id from list of segmentations
+	image = url_to_image(BASE_URL+ISIC_SEGMENTATION_ENDPOINT+'/'+segmentation_id+'/'+'mask') #get image
+	area = np.where(image != 0)
+	area = json.dumps(area[0].size)
+	return area
 
 @app.route("/studyList")
 def retrieveStudyList():

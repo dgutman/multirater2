@@ -18,7 +18,7 @@ var currentImgHeight;
 var unscaledCoords;
 var multiraterMatrix;
 var timer;
-//var arr;
+var segmentationArea;
 var polygonTemp;
 var numRaters;
 
@@ -106,17 +106,15 @@ function plotPointsOnImage(polygonPoints, color){
     img_g.append('polygon')
          .attr('points', polygonPoints)
          .attr('class', 'polygons')
-         .style("fill", color)
-         .style("stroke", "black")
-         .style("stroke-width", "4px")
          .on("mouseover", function() {
+            console.log(this);
             d3.select(this)
-                .attr("style", "fill: cyan");
+                .attr("style", "fill: cyan; stroke: black");
 
         })
          .on("mousemove", function(){
             //polygonTemp = this;
-            numRaters = 0;
+            //numRaters = 0;
             timer = setTimeout(function(){
                 numRaters = 0;
                 var polys = $('.polygons');
@@ -125,13 +123,13 @@ function plotPointsOnImage(polygonPoints, color){
                     numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
                 }
                 console.log(numRaters);
-                numRaters = 0;
+               //numRaters = 0;
             }, 600);
 
          })
          .on("mouseout", function() {
             d3.select(this)
-                .attr("style", "fill: lightgray");
+                .attr("style", "fill: lightgray; stroke: none");
             clearTimeout(timer);
             numRaters = 0;
         })
@@ -164,18 +162,29 @@ function displayAnnotation(selectedFeature){
     d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data){
         combinedAnnotationData = data;
-        multiraterMatrix = data['multiraterMatrix'];
-        delete combinedAnnotationData['multiraterMatrix']
+        multiraterMatrix = JSON.parse(data['multiraterMatrix']);
+        delete combinedAnnotationData['multiraterMatrix'];
         console.log(combinedAnnotationData);
+        origImgWidth = multiraterMatrix['width'];
+        origImgHeight = multiraterMatrix['height'];
+        var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray'];
+        var keyNames = Object.keys(combinedAnnotationData);
+
+        for (var i=0; i<keyNames.length; i++) {
+            if (keyNames[i].indexOf("area") != -1) {
+                continue;
+            }
+        }
         
-        var colors = ['lightgray', 'lightgray', 'lightgray', 'lightgray', 'lightgray']
-        for (var i=0; i<Object.keys(combinedAnnotationData).length; i++) {
-            var polygonPointString = combinedAnnotationData[Object.keys(combinedAnnotationData)[i]];
-            polygonPointJson = JSON.parse(polygonPointString)
+
+        for (var i=0; i<keyNames.length; i++) {
+            if (keyNames[i].indexOf("area") != -1) {continue;}
+            var polygonPointString = combinedAnnotationData[keyNames[i]];
+            polygonPointJson = JSON.parse(polygonPointString);
             for (var j=0; j<Object.keys(polygonPointJson).length; j++) {
-                polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]]
+                polygonPoints = polygonPointJson[Object.keys(polygonPointJson)[j]];
                 if (polygonPoints.length > 10) {
-                    plotPointsOnImage(polygonPoints, colors[i]);
+                    plotPointsOnImage(polygonPoints, colors[i%5]);
                 }
             }
         }
@@ -194,6 +203,9 @@ function plotSegmentation(imageId) {
              .style("stroke", "green")
              .style("stroke-width", "4px");
     })
+    getSegmentationArea(imageId).then(function(data){
+        segmentationArea = data;
+    })
     createFeatureMenu();
 }
 
@@ -206,6 +218,17 @@ function getSegmentationData(imageId) {
         return response.data;
     });
     return segData;
+}
+
+function getSegmentationArea(imageId) {
+    var segArea = {};
+    segArea = axios({
+        method: 'get',
+        url: "http://localhost:8080/segmentationArea/"+imageId,
+    }).then(function(response) {
+        return response.data;
+    });
+    return segArea;
 }
 
 function displayImage(imageId) {
@@ -323,8 +346,6 @@ function activateSelect(elementId, placeholderText){
         },
         allowClear: true
     });
-    origImgWidth = document.getElementById('outer-g').getBoundingClientRect().width;
-    origImgHeight = document.getElementById('outer-g').getBoundingClientRect().height;
 }
 
 function authenticate(user, ps) {
@@ -372,6 +393,36 @@ function getImageList(studyId) {
         return response.data;
     });
     return imageList;
+}
+
+ function sortJsObject(dict) {
+    var keys = [];
+    for(var key in dict) { 
+       if (key.indexOf("area") == -1) {
+          continue;
+       }
+       keys[keys.length] = key;
+     }
+     var values = [];     
+     for(var i = 0; i < keys.length; i++) {
+         values[values.length] = dict[keys [i]];
+     }
+     var sortedValues = values.sort(sortNumber);
+     var keyNames = [];
+     for(var i=0; i<sortedValues.length;i++){ 
+        keyNames[i] = getKeyByValue(dict, sortedValues[i]);
+        keyNames[i] = keyNames[i].replace("_area", "");
+     }
+     return [sortedValues, keyNames];
+}
+
+// this is needed to sort values as integers
+function sortNumber(a,b) {
+   return a - b;
+}
+
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
 }
 
 
