@@ -22,6 +22,8 @@ var segmentationArea;
 var polygonTemp;
 var numRaters;
 var annotatorAreaOrdered;
+var selectedImageIndex;
+var showArrows = false;
 
 const BASE_URL = "http://localhost:8080"
 
@@ -44,11 +46,10 @@ $(document).ready(function() {
             scale = parseFloat(scale).toFixed(3);
             scale = "Scale: "+scale+"x";
             $('#scaleText')[0].innerHTML = scale;
-
         }).scaleExtent([0.1, 10]))
         .append("g").attr("id", "outer-g")
     d3.select("#outer-g").append("g").attr("id", "inner-g")
-    displayImage('558d6301bae47801cf734ad1');
+    //displayImage('558d6301bae47801cf734ad1');
     activateLoader();
     activateSelect('studySelector', 'Select a Study');
     activateSelect('imageSelector', 'Select an Image');
@@ -62,7 +63,7 @@ $(document).ready(function() {
     });
     addViewerInfo();
     activateZoomButtons();
-
+     $('[data-toggle="tooltip"]').tooltip(); 
 })
 
 function activateZoomButtons(){
@@ -95,6 +96,28 @@ function activateZoomButtons(){
         $('#scaleText')[0].innerHTML = scaletxt;
     });
     d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
+    activateArrowButtons();
+}
+
+function activateArrowButtons(){
+    $('#rightarrow').click(function(){
+        if (selectedImageIndex < imageList.length) {
+            selectedImageIndex = selectedImageIndex + 1;
+            selectedImageName = imageList[selectedImageIndex];
+            $('#imageSelector')[0].value = selectedImageName;
+            $('#imageSelector').trigger("change");
+            displayImage(selectedImageId);
+        }
+    });
+    $('#leftarrow').click(function(){
+        if (selectedImageIndex > 0) {
+            selectedImageIndex = selectedImageIndex - 1;
+            selectedImageName = imageList[selectedImageIndex];
+            $('#imageSelector')[0].value = selectedImageName;
+            $('#imageSelector').trigger("change");
+            displayImage(selectedImageId);
+        }
+    });
 }
 
 function addAnnotatorInfo() {
@@ -480,7 +503,16 @@ function displayImage(imageId) {
     $('#svgImage').remove();
     $('polygon').remove();
     $('#hiddenTables').attr("style", "display: none");
+    showArrows = true;
     //}
+    if(!showArrows) {
+        d3.select('#leftarrow').attr('style', 'display: none');
+        d3.select('#rightarrow').attr('style', 'display: none');
+    } else {
+        d3.select('#leftarrow').attr('style', 'display: block');
+        d3.select('#rightarrow').attr('style', 'display: block')
+    }
+
     var svg = d3.select("#outer-g")
     svg.insert("svg:image", "#inner-g")
         .attr("xlink:href", "https://isic-archive.com/api/v1/image/" + imageId + "/download?contentDisposition=inline")
@@ -497,6 +529,7 @@ function displayImage(imageId) {
         imgCoords = getCoords(this);
         //console.log(unscaledCoords);
     });
+    d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
     plotSegmentation(imageId);
     displayClinicalTable(imageId);
 
@@ -563,11 +596,15 @@ function createImageMenu() {
         addOptions('imageSelector', imageList, 'Select an Image');
         $('#imageSelector').change(function() {
             selectedImage = this.value;
+            selectedImageIndex = imageList.indexOf(selectedImage);
             $.each(studyData['images'], function(key, value) {
                 if (value.name == selectedImage) {
                     selectedImageId = value['_id'];
                 }
             });
+            if ($('.arrows').css("display") == "none") {
+                //$('.arrows').css("display", "block");
+            }
             displayImage(selectedImageId);
         })
     });

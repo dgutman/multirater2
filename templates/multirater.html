@@ -27,7 +27,7 @@
             <div class="col-lg-12">
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="optionContainer">
             <div class="col-lg-12">
                 <div id="selectors">
                     <span class="selectorNum">1</span>
@@ -39,13 +39,21 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="viewerContainer">
             <div class="col-lg-12" id="viewer">
                 <span id="scaleText">Scale: 1x</span>
+                
                 <div id="zoomDiv">
-                    <img class="zoomImg" id="zoomIn" src="{{url_for('static', filename='zoom-in-icon.png')}}">
+
+                    
+                    <a href="#" data-toggle="tooltip" title="Using scroll to zoom is usually more efficient!">
+                    <img class="zoomImg" id="zoomIn" src="{{url_for('static', filename='zoom-in-icon.png')}}"></a>
+                    <a href="#" data-toggle="tooltip" title="Using scroll to zoom is usually more efficient!">
                     <img class="zoomImg" id="zoomOut" src="{{url_for('static', filename='zoom-out-icon.png')}}">
+                </a>
                 </div>
+                <img class="arrows" id="leftarrow" src="{{url_for('static', filename='leftarrow.png')}}">
+                <img class="arrows" id="rightarrow" src="{{url_for('static', filename='rightarrow.png')}}">
             </div>
         </div>
         <div class="row" id="hiddenTables">
