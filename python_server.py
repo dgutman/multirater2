@@ -15,8 +15,9 @@ ISIC_ANNOTATION_ENDPOINT = 'annotation'
 ISIC_SEGMENTATION_ENDPOINT = 'segmentation'
 ISIC_STUDY_ENDPOINT = 'study'
 ISIC_IMAGE_ENDPOINT = 'image'
-HOST = "0.0.0.0"
+HOST_ADDRESS = "http://localhost:8080" #include http://
 PORT = 8080
+HOST = HOST_ADDRESS + ":" + str(PORT)
 DIVISOR = 10
 
 def url_to_image(url):
@@ -173,4 +174,4 @@ def main():
 	return render_template('multirater.html')
 
 if __name__ == "__main__":
-	app.run(host=HOST, port=PORT)
+	app.run(host="0.0.0.0", port=PORT)

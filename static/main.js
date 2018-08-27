@@ -29,6 +29,10 @@ const BASE_URL = "http://localhost:8080"
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
+var zoom = d3.zoom().on("zoom", function(){
+    d3.select('#outer-g').attr("transform", d3.event.transform);
+});
+
 
 $(document).ready(function() {
     var gtoken = '';
@@ -68,32 +72,35 @@ $(document).ready(function() {
 
 function activateZoomButtons(){
     $('#zoomIn').click(function(){
-        var values = $('#outer-g').attr("transform").split(" ");
-        scale = values[1];
-        scale = scale.replace(/[^\d.-]/g, '');
-        scale = parseFloat(scale);
-        scale = scale + 0.25;
-        if (scale > 10) {scale = 10;}
-        scaleTxt = "scale("+scale+")";
-        transformText = values[0]+" "+scaleTxt;
-        d3.select('#outer-g').attr("transform", transformText);
-        scale = parseFloat(scale).toFixed(3);
-        scaletxt = "Scale: "+scale+"x";
-        $('#scaleText')[0].innerHTML = scaletxt;
+        transition_delay = 500;
+        var svg = d3.select('#main_svg');
+        zoom.scaleBy(svg.transition().duration(transition_delay), 1.3);
+        setTimeout(function(){
+            var values = $('#outer-g').attr("transform").split(" ");
+            scale = values[1];
+            scale = scale.replace(/[^\d.-]/g, '');
+            //scale = parseFloat(scale);
+            //d3.select('#outer-g').attr("transform", transformText);
+            scale = parseFloat(scale).toFixed(3);
+            scaletxt = "Scale: "+scale+"x";
+            $('#scaleText')[0].innerHTML = scaletxt;
+        }, transition_delay);
     });
     $('#zoomOut').click(function(){
-        var values = $('#outer-g').attr("transform").split(" ");
-        scale = values[1];
-        scale = scale.replace(/[^\d.-]/g, '');
-        scale = parseFloat(scale);
-        scale = scale - 0.25;
-        if (scale < 0.1) {scale = 0.1;}
-        scaleTxt = "scale("+scale+")";
-        transformText = values[0]+" "+scaleTxt;
-        d3.select('#outer-g').attr("transform", transformText);
-        scale = parseFloat(scale).toFixed(3);
-        scaletxt = "Scale: "+scale+"x";
-        $('#scaleText')[0].innerHTML = scaletxt;
+        transition_delay = 500;
+        var svg = d3.select('#main_svg');
+        zoom.scaleBy(svg.transition().duration(transition_delay), 0.7);
+        setTimeout(function(){
+            var values = $('#outer-g').attr("transform").split(" ");
+            scale = values[1];
+            scale = scale.replace(/[^\d.-]/g, '');
+            //scale = parseFloat(scale);
+            //d3.select('#outer-g').attr("transform", transformText);
+            scale = parseFloat(scale).toFixed(3);
+            scaletxt = "Scale: "+scale+"x";
+            $('#scaleText')[0].innerHTML = scaletxt;
+        }, transition_delay);
+
     });
     d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
     activateArrowButtons();
@@ -532,7 +539,8 @@ function displayImage(imageId) {
     d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
     plotSegmentation(imageId);
     displayClinicalTable(imageId);
-
+    var svg = d3.select('#main_svg');
+    zoom.scaleTo(svg.transition(), 0.2);
 }
 
 function getCoords(place) {
