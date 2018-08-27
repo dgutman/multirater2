@@ -36,6 +36,13 @@ $(document).ready(function() {
         .attr("height", "100%")
         .call(d3.zoom().on("zoom", function() {
             svg.attr("transform", d3.event.transform)
+            var values = $('#outer-g').attr("transform").split(" ");
+            var scale = values[1];
+            scale = scale.replace(/[^\d.-]/g, '');
+            scale = parseFloat(scale).toFixed(3);
+            scale = "Scale: "+scale+"x";
+            $('#scaleText')[0].innerHTML = scale;
+
         }).scaleExtent([0.1, 10]))
         .append("g").attr("id", "outer-g")
     d3.select("#outer-g").append("g").attr("id", "inner-g")
@@ -52,8 +59,41 @@ $(document).ready(function() {
         }
     });
     addViewerInfo();
+    activateZoomButtons();
 
 })
+
+function activateZoomButtons(){
+    $('#zoomIn').click(function(){
+        var values = $('#outer-g').attr("transform").split(" ");
+        scale = values[1];
+        scale = scale.replace(/[^\d.-]/g, '');
+        scale = parseFloat(scale);
+        scale = scale + 0.25;
+        if (scale > 10) {scale = 10;}
+        scaleTxt = "scale("+scale+")";
+        transformText = values[0]+" "+scaleTxt;
+        d3.select('#outer-g').attr("transform", transformText);
+        scale = parseFloat(scale).toFixed(3);
+        scaletxt = "Scale: "+scale+"x";
+        $('#scaleText')[0].innerHTML = scaletxt;
+    });
+    $('#zoomOut').click(function(){
+        var values = $('#outer-g').attr("transform").split(" ");
+        scale = values[1];
+        scale = scale.replace(/[^\d.-]/g, '');
+        scale = parseFloat(scale);
+        scale = scale - 0.25;
+        if (scale < 0.1) {scale = 0.1;}
+        scaleTxt = "scale("+scale+")";
+        transformText = values[0]+" "+scaleTxt;
+        d3.select('#outer-g').attr("transform", transformText);
+        scale = parseFloat(scale).toFixed(3);
+        scaletxt = "Scale: "+scale+"x";
+        $('#scaleText')[0].innerHTML = scaletxt;
+    });
+    d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
+}
 
 function addAnnotatorInfo() {
     $('#userTable').remove()
@@ -131,7 +171,7 @@ function addViewerInfo() {
         .attr('id', 'newg')
 
     d3.select('#newg').append('text')
-        .text("Number of Raters at Point: ")
+        .text("Number of Raters at Cursor: ")
         .attr('id', 'numRatersText')
         .attr('class', 'ratersInfo')
         .attr('x', '2%')
@@ -188,14 +228,16 @@ function getAnnotationData(studyId, imageId, feature) {
 function createFeatureMenu() { //need to clear feature menu
     $('#featureSelector').children().remove();
     var featureListTmp = [];
-    getFeatureList(selectedStudyId, selectedImageId).then(function(data) {
-        featureData = data;
-        $.each(featureData, function(x) {
-            featureListTmp.push(x + " [" + featureData[x].length + "]");
+    if (selectedStudyId != "") {
+        getFeatureList(selectedStudyId, selectedImageId).then(function(data) {
+            featureData = data;
+            $.each(featureData, function(x) {
+                featureListTmp.push(x + " [" + featureData[x].length + "]");
+            });
+            featureList = featureListTmp;
+            addOptions('featureSelector', featureList, 'Select a Feature');
         });
-        featureList = featureListTmp;
-        addOptions('featureSelector', featureList, 'Select a Feature');
-    });
+    }
 }
 
 function getFeatureList(studyId, imageId) {
@@ -225,14 +267,14 @@ function plotPointsOnImage(polygonPoints, count) {
                     //console.log(polygon);
                     display_status = polygon.style.display;
                     if (display_status == 'none') {
-                        console.log('nonez');
+                        //console.log('nonez');
                         continue;
                     } else {
                         polygon.style.fillOpacity = 0;
                     }
             }
             $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
-            $('#userSelectedText')[0].innerHTML = userclass.replace("User", "User ");
+            $('#userSelectedText')[0].innerHTML = userclass.replace("User", "Region Annotated By User ");
         })
         .on("mousemove", function() {
             timer = setTimeout(function() {
@@ -254,7 +296,7 @@ function plotPointsOnImage(polygonPoints, count) {
                     //console.log(polygon);
                     display_status = polygon.style.display;
                     if (display_status == 'none') {
-                        console.log('nonez');
+                        //console.log('nonez');
                         continue;
                     } else {
                         polygon.style.fillOpacity = 1;
@@ -292,14 +334,14 @@ function displayAnnotation(selectedFeature) {
     //var polygonPoints;
     annotatorAreaOrdered = [];
     $('#inner-g').children().remove();
-    console.log(selectedFeature);
+    //console.log(selectedFeature);
     d3.select('#loadingDiv').attr("style", "display:block");
     getAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data) {
         annotatorAreaOrdered = [];
         combinedAnnotationData = data;
         multiraterMatrix = JSON.parse(data['multiraterMatrix']);
         delete combinedAnnotationData['multiraterMatrix'];
-        console.log(combinedAnnotationData);
+        //console.log(combinedAnnotationData);
         origImgWidth = multiraterMatrix['width'];
         origImgHeight = multiraterMatrix['height'];
 
@@ -382,7 +424,7 @@ function getUsersFromAnnotationIds() {
         for (var i = 0; i < data.length; i++) {
             data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
         }
-        console.log(data);
+        //console.log(data);
         annotatorAreaOrdered[annotatorAreaOrdered.length] = data;
 
         return response.data;
@@ -398,7 +440,7 @@ function getUsers() {
         for (var i = 0; i < data.length; i++) {
             data[i] = data[i].replace(/[^0-9a-z ]/gi, '');
         }
-        console.log(data);
+        //console.log(data);
         annotatorAreaOrdered[annotatorAreaOrdered.length] = data;
     })
 }

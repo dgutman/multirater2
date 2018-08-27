@@ -41,7 +41,11 @@
         </div>
         <div class="row">
             <div class="col-lg-12" id="viewer">
-
+                <span id="scaleText">Scale: 1x</span>
+                <div id="zoomDiv">
+                    <img class="zoomImg" id="zoomIn" src="{{url_for('static', filename='zoom-in-icon.png')}}">
+                    <img class="zoomImg" id="zoomOut" src="{{url_for('static', filename='zoom-out-icon.png')}}">
+                </div>
             </div>
         </div>
         <div class="row" id="hiddenTables">
