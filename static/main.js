@@ -23,6 +23,8 @@ var polygonTemp;
 var numRaters;
 var annotatorAreaOrdered;
 
+const BASE_URL = "http://localhost:8080"
+
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 
@@ -215,7 +217,7 @@ function getAnnotationData(studyId, imageId, feature) {
         var annotationMaskData = {};
         annotationMaskData = axios({
             method: 'get',
-            url: "http://localhost:8080/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
+            url: BASE_URL+"/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
         }).then(function(response) {
             return response.data;
 
@@ -244,7 +246,7 @@ function getFeatureList(studyId, imageId) {
     var featureList = {};
     featureList = axios({
         method: 'get',
-        url: "http://localhost:8080/featuresForStudyImage/" + studyId + '/' + imageId,
+        url: BASE_URL+"/featuresForStudyImage/" + studyId + '/' + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -394,7 +396,7 @@ function getSegmentationData(imageId) {
     var segData = {};
     segData = axios({
         method: 'get',
-        url: "http://localhost:8080/segmentation/" + imageId,
+        url: BASE_URL+"/segmentation/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -405,7 +407,7 @@ function getSegmentationArea(imageId) {
     var segArea = {};
     segArea = axios({
         method: 'get',
-        url: "http://localhost:8080/segmentationArea/" + imageId,
+        url: BASE_URL+"/segmentationArea/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -416,7 +418,7 @@ function getUsersFromAnnotationIds() {
     var usernames = {};
     usernames = axios({
         method: 'post',
-        url: "http://localhost:8080/usersFromAnnotation",
+        url: BASE_URL+"/usersFromAnnotation",
         data: annotatorAreaOrdered[1]
     }).then(function(response) {
         data = response.data;
@@ -449,7 +451,7 @@ function getClinicalInfo(imageId) {
     var info = {};
     info = axios({
         method: 'get',
-        url: "http://localhost:8080/imageDetails/" + imageId,
+        url: BASE_URL+"/imageDetails/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -621,7 +623,7 @@ function getStudyList() {
     var studyList = {};
     studyList = axios({
         method: 'get',
-        url: "http://localhost:8080/studyList",
+        url: BASE_URL+"/studyList",
     }).then(function(response) {
         return response.data;
     });
@@ -632,7 +634,7 @@ function getImageList(studyId) {
     var imageList = {};
     imageList = axios({
         method: 'get',
-        url: "http://localhost:8080/imageList/" + studyId,
+        url: BASE_URL+"/imageList/" + studyId,
     }).then(function(response) {
         return response.data;
     });
