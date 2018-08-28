@@ -60,6 +60,7 @@ $(document).ready(function() {
     activateSelect('featureSelector', 'Select a Feature');
     createStudyMenu();
     $('#featureSelector').change(function() {
+        $('.table').remove();
         selectedFeature = this.value.substring(0, this.value.lastIndexOf(' '));
         if (selectedFeature != "") {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
@@ -67,8 +68,16 @@ $(document).ready(function() {
     });
     addViewerInfo();
     activateZoomButtons();
-     $('[data-toggle="tooltip"]').tooltip(); 
+     $('[data-toggle="tooltip"]').tooltip();
+    
 })
+
+function activateSwitches() {
+    $('input').each(function(index, element){
+        $("[name='"+element.name+"']").bootstrapSwitch({size: 'sm'});
+    })
+    
+}
 
 function activateZoomButtons(){
     $('#zoomIn').click(function(){
@@ -146,6 +155,7 @@ function addAnnotatorInfo() {
     }
     $('#userTable').easyTable();
     $('#easyMenuTable').remove();
+    activateSwitches();
 }
 
 function addColorTable() {
@@ -399,9 +409,11 @@ function displayAnnotation(selectedFeature) {
                 }
             }
             d3.select('#loadingDiv').attr("style", "display:none");
+            displayClinicalTable(selectedImageId);
             addAnnotatorInfo();
             addColorTable();
             addStatsTable();
+
             $('#hiddenTables').attr("style", "display: flex");
         })
     })
@@ -492,11 +504,27 @@ function getClinicalInfo(imageId) {
 
 function displayClinicalTable(imageId){
     getClinicalInfo(imageId).then(function(data){
-        $('#clinicalTable').remove()
-        content = '<table id="clinicalTable">';
-        for (var i = 0; i < Object.keys(data).length; i++) {
+        $('#clinicalTable').remove();
+        var newdata = {};
+        newdata['diagnosis'] = data['diagnosis'];
+        delete data['diagnosis'];
+        newdata['benign_malignant'] = data['benign_malignant'];
+        delete data['benign_malignant'];
+        num_entries = $('#userTable').children().children().length;
+        for (var i = 0; i < num_entries; i++) {
             if (Object.values(data)[i] == null) {continue;}
-            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(data)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(data)[i] + '</td></tr>';
+            newdata[Object.keys(data)[i]] = Object.values(data)[i];
+        }
+
+
+        //table_elements = annotatorAreaOrdered[0].length;
+        console.log(data);
+        console.log(newdata);
+
+        content = '<table id="clinicalTable">';
+        for (var i = 0; i < num_entries; i++) {
+            if (Object.values(newdata)[i] == null) {continue;}
+            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(newdata)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(newdata)[i] + '</td></tr>';
             //table.append(row);
         }
         content = content + '</table>';
@@ -533,7 +561,7 @@ function displayImage(imageId) {
     });
     d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
     plotSegmentation(imageId);
-    displayClinicalTable(imageId);
+    
     var svg = d3.select('#main_svg');
     zoom.scaleTo(svg.transition(), 0.2);
 /*    if(!showArrows) {
@@ -640,6 +668,7 @@ function addOptions(elementId, selectValues, placeholderText) {
     });
     activateSelect(elementId, placeholderText);
     $('#' + elementId).val(null).trigger('change');
+
 }
 
 function activateSelect(elementId, placeholderText) {

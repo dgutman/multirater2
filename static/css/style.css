@@ -83,10 +83,10 @@
 }
 
 #loadingImg {
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    z-index: 20;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
 .polygons {
@@ -161,13 +161,13 @@
 }
 
 #viewer {
-    display: flex;
+    display: inline-grid;
 }
 
 #leftarrow {
     position: absolute;
     height: 100px;
-    left: -50px;
+    left: -65px;
     top: 40%;
 }
 
@@ -175,7 +175,7 @@
 #leftarrow:hover {
     position: absolute;
     height: 100px;
-    left: -50px;
+    left: -65px;
     top: 40%;
     cursor: pointer;
     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
@@ -183,77 +183,57 @@
 
 #rightarrow {
     height: 100px;
-    right: -50px;
+    right: -65px;
     top: 40%;
     position: absolute;
 }
 
 #rightarrow:hover {
     height: 100px;
-    right: -50px;
+    right: -65px;
     top: 40%;
     position: absolute;
     cursor: pointer;
     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
 
-
 .arrows {
     display: none;
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
+.btn-group {
+    width: 15px;
 }
 
-.switch input {display:none;}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #2196F3;
-  -webkit-transition: .4s;
-  transition: .4s;
+.btn.btn-default.btn-sm {
+    background-color: gray;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+.btn-sm {
+    line-height: 1;
 }
 
-input:checked + .slider {
-  background-color: #ccc;
+.table td, .table th {
+    padding: 0.5rem;
 }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #ccc;
+.btn-group, .btn-group-vertical {
+    vertical-align: bottom;
 }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+.col-lg-12 {
+    padding-right: 0;
+    padding-left: 0;
 }
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
+#openClinicalButton {
+    color: green;
+    border: green solid 2px;
+    border-radius: 3px;
+    /* padding: 0px 3px; */
+    padding-left: 3px;
+    text-align: center;
+    padding-right: 3px;
+    padding-bottom: 2px;
+    cursor: pointer;
 }
