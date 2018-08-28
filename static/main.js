@@ -25,6 +25,7 @@ var annotatorAreaOrdered;
 var selectedImageIndex;
 var showArrows = true;
 var imageMetadata;
+var table_html;
 
 const BASE_URL = "http://localhost:8080"
 
@@ -72,14 +73,18 @@ $(document).ready(function() {
     activateZoomButtons();
     $('[data-toggle="tooltip"]').tooltip();
     $('#openClinicalButton').click(function() {
+        $('#metadataModal').children().remove();
+        $('#metadataModal').append(table_html);
+        $('#metadataModal').append("<span id='modalClose'>Close</span>");
         $('#metadataTable').easyTable();
         $('#metadataModal').modal();
         $('#easyMenuTable').remove();
+        $('#metadataModal span').attr('id', 'modalClose')
+        $('#modalClose').click(function() {
+            $.modal.close();
+        });
     });
-    $('#metadataModal span').attr('id', 'modalClose')
-    $('#modalClose').click(function() {
-        $.modal.close();
-    });
+
 
 })
 
@@ -428,8 +433,6 @@ function displayAnnotation(selectedFeature) {
             addStatsTable();
 
             $('#hiddenTables').attr("style", "display: flex");
-            var table_html = fullMetadataTable(imageMetadata);
-            $('#metadataModal').prepend(table_html);
         })
     })
 }
@@ -520,9 +523,7 @@ function getClinicalInfo(imageId) {
 function getImageMetadata(imageId) {
     getClinicalInfo(imageId).then(function(data) {
         imageMetadata = data;
-        var table_html = fullMetadataTable(data);
-        $('#metadataModal').prepend(table_html);
-        //
+        table_html = fullMetadataTable(imageMetadata);
     });
 }
 
@@ -626,14 +627,7 @@ function displayImage(imageId) {
 
     var svg = d3.select('#main_svg');
     zoom.scaleTo(svg.transition(), 0.2);
-    /*    if(!showArrows) {
-            d3.select('#leftarrow').attr('style', 'display: none');
-            d3.select('#rightarrow').attr('style', 'display: none');
-        } else {
-            d3.select('#leftarrow').attr('style', 'display: block');
-            d3.select('#rightarrow').attr('style', 'display: block')
-        }
-        showArrows = true;*/
+
 }
 
 function getCoords(place) {
@@ -696,6 +690,7 @@ function createImageMenu() {
         imageList = imageListTmp;
         addOptions('imageSelector', imageList, 'Select an Image');
         $('#imageSelector').change(function() {
+            
             selectedImage = this.value;
             selectedImageIndex = imageList.indexOf(selectedImage);
             $.each(studyData['images'], function(key, value) {
@@ -718,7 +713,8 @@ function createImageMenu() {
             }
             displayImage(selectedImageId);
             getImageMetadata(selectedImageId);
-
+            $('#metadataModal').children().remove();
+            //var table_html = fullMetadataTable(imageMetadata);
         })
     });
 }
