@@ -241,3 +241,27 @@
     cursor: pointer;
     display: none;
 }
+
+#modalClose {
+    margin-left: auto; 
+    margin-right: auto; 
+    display: table; 
+    padding: 10px 5px; 
+    border: navy solid 2px; 
+    border-radius: 10px;
+    cursor: pointer;
+    color: navy;
+    background-color: white;
+}
+
+#modalClose:hover {
+    margin-left: auto; 
+    margin-right: auto; 
+    display: table; 
+    padding: 10px 5px; 
+    border: navy solid 2px; 
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    background-color: navy;
+}

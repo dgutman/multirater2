@@ -70,6 +70,15 @@ $(document).ready(function() {
     addViewerInfo();
     activateZoomButtons();
      $('[data-toggle="tooltip"]').tooltip();
+    $('#openClinicalButton').click(function() {
+        $('#metadataTable').easyTable();
+        $('#metadataModal').modal();
+        $('#easyMenuTable').remove();
+    });
+    $('#metadataModal span').attr('id', 'modalClose')
+    $('#modalClose').click(function(){
+        $.modal.close();
+    });
     
 })
 
@@ -506,14 +515,17 @@ function getClinicalInfo(imageId) {
 function getImageMetadata(imageId){
     getClinicalInfo(imageId).then(function(data){
         imageMetadata = data;
+        table_html = fullMetadataTable(data);
+        $('#metadataModal').prepend(table_html);
+        //
     });
 }
 
-function fullMetadataTable(){
-    json = imageMetadata;
+function fullMetadataTable(data){
+    json = data;
     var num_headers = Object.keys(json).length;
     var the_headers = Object.keys(json);
-    var table_str = "<table><tr>";
+    var table_str = "<table id='metadataTable'><tr>";
     for (var i=0; i<num_headers; i++) {
       table_str += "<tr>";
       table_str += "<th colspan='2'>";
@@ -535,6 +547,7 @@ function fullMetadataTable(){
       table_str = table_str + "</tr>";
     }
     table_str += "</table>";
+    return table_str;
 }
 
 function displayClinicalTable(imageId){
@@ -577,6 +590,7 @@ function displayImage(imageId) {
     $('#svgImage').remove();
     $('polygon').remove();
     $('#openClinicalButton').attr("style", "display: unset");
+
 
     //}
 
@@ -693,6 +707,7 @@ function createImageMenu() {
             }
             displayImage(selectedImageId);
             getImageMetadata(selectedImageId);
+
         })
     });
 }
