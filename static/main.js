@@ -23,7 +23,7 @@ var polygonTemp;
 var numRaters;
 var annotatorAreaOrdered;
 var selectedImageIndex;
-var showArrows = false;
+var showArrows = true;
 
 const BASE_URL = "http://localhost:8080"
 
@@ -131,7 +131,9 @@ function addAnnotatorInfo() {
     $('#userTable').remove()
     content = '<table id="userTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
-        content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + annotatorAreaOrdered[2][i] + '</td></tr>';
+        content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + 
+         "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + 
+          annotatorAreaOrdered[2][i] + '</td></tr>';
     }
     content = content + '</table>';
     $('#annotatorInfo').append(content);
@@ -510,15 +512,8 @@ function displayImage(imageId) {
     $('#svgImage').remove();
     $('polygon').remove();
     $('#hiddenTables').attr("style", "display: none");
-    showArrows = true;
+
     //}
-    if(!showArrows) {
-        d3.select('#leftarrow').attr('style', 'display: none');
-        d3.select('#rightarrow').attr('style', 'display: none');
-    } else {
-        d3.select('#leftarrow').attr('style', 'display: block');
-        d3.select('#rightarrow').attr('style', 'display: block')
-    }
 
     var svg = d3.select("#outer-g")
     svg.insert("svg:image", "#inner-g")
@@ -541,6 +536,14 @@ function displayImage(imageId) {
     displayClinicalTable(imageId);
     var svg = d3.select('#main_svg');
     zoom.scaleTo(svg.transition(), 0.2);
+/*    if(!showArrows) {
+        d3.select('#leftarrow').attr('style', 'display: none');
+        d3.select('#rightarrow').attr('style', 'display: none');
+    } else {
+        d3.select('#leftarrow').attr('style', 'display: block');
+        d3.select('#rightarrow').attr('style', 'display: block')
+    }
+    showArrows = true;*/
 }
 
 function getCoords(place) {
@@ -610,8 +613,18 @@ function createImageMenu() {
                     selectedImageId = value['_id'];
                 }
             });
-            if ($('.arrows').css("display") == "none") {
-                //$('.arrows').css("display", "block");
+            if(selectedImageIndex==0) {
+                console.log('0');
+                d3.select('#leftarrow').attr('style', 'display: none');
+                d3.select('#rightarrow').attr('style', 'display: block');
+            } 
+            if(selectedImageIndex>0 & selectedImageIndex<(imageList.length-1)) {
+                d3.select('#leftarrow').attr('style', 'display: block');
+                d3.select('#rightarrow').attr('style', 'display: block');
+            }
+            if(selectedImageIndex==(imageList.length-1)) {
+                d3.select('#rightarrow').attr('style', 'display: none');
+                d3.select('#leftarrow').attr('style', 'display: block');
             }
             displayImage(selectedImageId);
         })
