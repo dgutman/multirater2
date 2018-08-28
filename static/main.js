@@ -576,7 +576,7 @@ function displayImage(imageId) {
     //if ($('#viewer').children().first().length > 0) {
     $('#svgImage').remove();
     $('polygon').remove();
-    $('#hiddenTables').attr("style", "display: none");
+    $('#openClinicalButton').attr("style", "display: unset");
 
     //}
 
