@@ -62,6 +62,7 @@ $(document).ready(function() {
     createStudyMenu();
     $('#featureSelector').change(function() {
         $('.table').remove();
+
         selectedFeature = this.value.substring(0, this.value.lastIndexOf(' '));
         if (selectedFeature != "") {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
@@ -427,6 +428,8 @@ function displayAnnotation(selectedFeature) {
             addStatsTable();
 
             $('#hiddenTables').attr("style", "display: flex");
+            var table_html = fullMetadataTable(imageMetadata);
+            $('#metadataModal').prepend(table_html);
         })
     })
 }
@@ -517,14 +520,14 @@ function getClinicalInfo(imageId) {
 function getImageMetadata(imageId) {
     getClinicalInfo(imageId).then(function(data) {
         imageMetadata = data;
-        table_html = fullMetadataTable(data);
+        var table_html = fullMetadataTable(data);
         $('#metadataModal').prepend(table_html);
         //
     });
 }
 
 function fullMetadataTable(data) {
-    json = data;
+    var json = data;
     var num_headers = Object.keys(json).length;
     var the_headers = Object.keys(json);
     var table_str = "<table id='metadataTable'><tr>";

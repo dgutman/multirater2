@@ -177,6 +177,7 @@
 }
  .btn-group {
      width: 15px;
+     z-index: 1;
 }
  .btn.btn-default.btn-sm {
      background-color: gray;
