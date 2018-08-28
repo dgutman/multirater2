@@ -1,267 +1,232 @@
 #main_svg {
-	height: 50vh;
-	border-color: cornflowerblue;
-	border-style: solid;
-	border-width: 2px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+     height: 50vh;
+     border-color: cornflowerblue;
+     border-style: solid;
+     border-width: 2px;
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
-
-#menubar {
-    height: 60px;
-    border-bottom-width: 1px;
-    border-bottom-color: gray;
-    margin: 0 auto;
-    white-space: nowrap;
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
-    text-align: center;
-    position: relative;
-    padding-top: 20px;
-    width: 100%;
+ #menubar {
+     height: 60px;
+     border-bottom-width: 1px;
+     border-bottom-color: gray;
+     margin: 0 auto;
+     white-space: nowrap;
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+     text-align: center;
+     position: relative;
+     padding-top: 20px;
+     width: 100%;
 }
-
-.main-header-logo {
-    color: #353940;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    line-height: 16px;
-    cursor: pointer;
-    margin-right: 40px;
+ .main-header-logo {
+     color: #353940;
+     font-size: 20px;
+     font-weight: 700;
+     letter-spacing: 1px;
+     line-height: 16px;
+     cursor: pointer;
+     margin-right: 40px;
 }
-
-.header-menu-item a {
-    width: auto;
-    height: 60px;
-    overflow: hidden;
-    padding: 15px 10px;
-    cursor: pointer;
-    letter-spacing: 0.2px;
-    color: #6E7480;
+ .header-menu-item a {
+     width: auto;
+     height: 60px;
+     overflow: hidden;
+     padding: 15px 10px;
+     cursor: pointer;
+     letter-spacing: 0.2px;
+     color: #6E7480;
 }
-
-#selectors {
-	display: table;
-	margin: 25px auto;
+ #selectors {
+     display: table;
+     margin: 25px auto;
 }
-
-#imageSelector {
-    min-width: 150px;
+ #imageSelector {
+     min-width: 150px;
 }
-
-#featureSelector {
-    min-width: 150px;
+ #featureSelector {
+     min-width: 150px;
 }
-
-.selectorNum {
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  padding: 8px 16px;
-  background: #fff;
-  border: 2px solid cornflowerblue;
-  color: cornflowerblue;
-  text-align: center;
-  font: 32px Arial, sans-serif;
-  margin-right: 4px;
+ .selectorNum {
+     border-radius: 50%;
+     width: 36px;
+     height: 36px;
+     padding: 8px 16px;
+     background: #fff;
+     border: 2px solid cornflowerblue;
+     color: cornflowerblue;
+     text-align: center;
+     font: 32px Arial, sans-serif;
+     margin-right: 4px;
 }
-
-.select2 {
-    min-width: 150px;
-    margin-top: -10px !important;
-    margin-right: 4px !important;
+ .select2 {
+     min-width: 150px;
+     margin-top: -10px !important;
+     margin-right: 4px !important;
 }
-
-#loadingDiv {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-    background-color: ghostwhite;
-    opacity: 0.8;
-    display: none;
-    top: 0;
+ #loadingDiv {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     z-index: 10;
+     background-color: ghostwhite;
+     opacity: 0.8;
+     display: none;
+     top: 0;
 }
-
-#loadingImg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
+ #loadingImg {
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%,-50%);
 }
-
-.polygons {
-    mix-blend-mode: multiply;
-    stroke-width: 4px;
-    fill: lightblue;
-/*    fill-opacity: 1; */
+ .polygons {
+     mix-blend-mode: multiply;
+     stroke-width: 4px;
+     fill: lightblue;
+    /* fill-opacity: 1;
+     */
 }
-
-#inner-g {
-    isolation: isolate;
+ #inner-g {
+     isolation: isolate;
 }
-
-.infoHeader {
-    text-align: center;
+ .infoHeader {
+     text-align: center;
 }
-
-.colorBox {
-    height: 24px;
-    width: 24px;
-    background-color: lightblue;
-    position: absolute;
-    mix-blend-mode: multiply;
-    border: black;
-    border-width: 1px;
-    border-style: solid;
+ .colorBox {
+     height: 24px;
+     width: 24px;
+     background-color: lightblue;
+     position: absolute;
+     mix-blend-mode: multiply;
+     border: black;
+     border-width: 1px;
+     border-style: solid;
 }
-
-.spacerspan {
-    width: 30px;
-    height: 5px;
-    background-color: white;
-    opacity: 0;
+ .spacerspan {
+     width: 30px;
+     height: 5px;
+     background-color: white;
+     opacity: 0;
 }
-
-#statsNote {
-    font-size: 10px;
-    position: absolute;
-    top: 18px;
+ #statsNote {
+     font-size: 10px;
+     position: absolute;
+     top: 18px;
 }
-
-#hiddenTables {
-    padding-top: 10px;
-    margin-top: 10px;
-    /*display: none;*/
-    background-color: #eee;
+ #hiddenTables {
+     padding-top: 10px;
+     margin-top: 10px;
+    /*display: none;
+    */
+     background-color: #eee;
 }
-
-#zoomDiv {
-    position: absolute;
-    bottom: 10px;
-    right: 15px;
+ #zoomDiv {
+     position: absolute;
+     bottom: 10px;
+     right: 15px;
 }
-
-.zoomImg {
-    display: block;
-    cursor: pointer;
+ .zoomImg {
+     display: block;
+     cursor: pointer;
 }
-
-#zoomIn:hover {
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+ #zoomIn:hover {
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
-
-#zoomOut:hover {
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+ #zoomOut:hover {
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
-
-#scaleText {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding-bottom: 10px;
-    padding-right: 130px;
+ #scaleText {
+     position: absolute;
+     bottom: 0;
+     right: 0;
+     padding-bottom: 10px;
+     padding-right: 130px;
 }
-
-#viewer {
-    display: inline-grid;
+ #viewer {
+     display: inline-grid;
 }
-
-#leftarrow {
-    position: absolute;
-    height: 100px;
-    left: -65px;
-    top: 40%;
+ #leftarrow {
+     position: absolute;
+     height: 100px;
+     left: -65px;
+     top: 40%;
 }
-
-
-#leftarrow:hover {
-    position: absolute;
-    height: 100px;
-    left: -65px;
-    top: 40%;
-    cursor: pointer;
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+ #leftarrow:hover {
+     position: absolute;
+     height: 100px;
+     left: -65px;
+     top: 40%;
+     cursor: pointer;
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
-
-#rightarrow {
-    height: 100px;
-    right: -65px;
-    top: 40%;
-    position: absolute;
+ #rightarrow {
+     height: 100px;
+     right: -65px;
+     top: 40%;
+     position: absolute;
 }
-
-#rightarrow:hover {
-    height: 100px;
-    right: -65px;
-    top: 40%;
-    position: absolute;
-    cursor: pointer;
-    box-shadow: 0px 0px 10px rgba(0,0,0,.5);
+ #rightarrow:hover {
+     height: 100px;
+     right: -65px;
+     top: 40%;
+     position: absolute;
+     cursor: pointer;
+     box-shadow: 0px 0px 10px rgba(0,0,0,.5);
 }
-
-.arrows {
-    display: none;
+ .arrows {
+     display: none;
 }
-
-.btn-group {
-    width: 15px;
+ .btn-group {
+     width: 15px;
 }
-
-.btn.btn-default.btn-sm {
-    background-color: gray;
+ .btn.btn-default.btn-sm {
+     background-color: gray;
 }
-
-.btn-sm {
-    line-height: 1;
+ .btn-sm {
+     line-height: 1;
 }
-
-.table td, .table th {
-    padding: 0.5rem;
-    border-color: #999;
+ .table td, .table th {
+     padding: 0.5rem;
+     border-color: #999;
 }
-
-.btn-group, .btn-group-vertical {
-    vertical-align: bottom;
+ .btn-group, .btn-group-vertical {
+     vertical-align: bottom;
 }
-
-.col-lg-12 {
-    padding-right: 0;
-    padding-left: 0;
+ .col-lg-12 {
+     padding-right: 0;
+     padding-left: 0;
 }
-
-#openClinicalButton {
-    color: green;
-    border: green solid 2px;
-    border-radius: 3px;
-    /* padding: 0px 3px; */
-    padding-left: 3px;
-    text-align: center;
-    padding-right: 3px;
-    padding-bottom: 2px;
-    cursor: pointer;
-    display: none;
+ #openClinicalButton {
+     color: green;
+     border: green solid 2px;
+     border-radius: 3px;
+    /* padding: 0px 3px;
+     */
+     padding-left: 3px;
+     text-align: center;
+     padding-right: 3px;
+     padding-bottom: 2px;
+     cursor: pointer;
+     display: none;
 }
-
-#modalClose {
-    margin-left: auto; 
-    margin-right: auto; 
-    display: table; 
-    padding: 10px 5px; 
-    border: navy solid 2px; 
-    border-radius: 10px;
-    cursor: pointer;
-    color: navy;
-    background-color: white;
+ #modalClose {
+     margin-left: auto;
+     margin-right: auto;
+     display: table;
+     padding: 10px 5px;
+     border: navy solid 2px;
+     border-radius: 10px;
+     cursor: pointer;
+     color: navy;
+     background-color: white;
 }
-
-#modalClose:hover {
-    margin-left: auto; 
-    margin-right: auto; 
-    display: table; 
-    padding: 10px 5px; 
-    border: navy solid 2px; 
-    border-radius: 10px;
-    cursor: pointer;
-    color: white;
-    background-color: navy;
+ #modalClose:hover {
+     margin-left: auto;
+     margin-right: auto;
+     display: table;
+     padding: 10px 5px;
+     border: navy solid 2px;
+     border-radius: 10px;
+     cursor: pointer;
+     color: white;
+     background-color: navy;
 }

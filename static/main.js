@@ -30,7 +30,7 @@ const BASE_URL = "http://localhost:8080"
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
-var zoom = d3.zoom().on("zoom", function(){
+var zoom = d3.zoom().on("zoom", function() {
     d3.select('#outer-g').attr("transform", d3.event.transform);
 });
 
@@ -49,7 +49,7 @@ $(document).ready(function() {
             var scale = values[1];
             scale = scale.replace(/[^\d.-]/g, '');
             scale = parseFloat(scale).toFixed(3);
-            scale = "Scale: "+scale+"x";
+            scale = "Scale: " + scale + "x";
             $('#scaleText')[0].innerHTML = scale;
         }).scaleExtent([0.1, 10]))
         .append("g").attr("id", "outer-g")
@@ -69,54 +69,56 @@ $(document).ready(function() {
     });
     addViewerInfo();
     activateZoomButtons();
-     $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip();
     $('#openClinicalButton').click(function() {
         $('#metadataTable').easyTable();
         $('#metadataModal').modal();
         $('#easyMenuTable').remove();
     });
     $('#metadataModal span').attr('id', 'modalClose')
-    $('#modalClose').click(function(){
+    $('#modalClose').click(function() {
         $.modal.close();
     });
-    
+
 })
 
 function activateSwitches() {
-    $('input').each(function(index, element){
-        $("[name='"+element.name+"']").bootstrapSwitch({size: 'sm'});
+    $('input').each(function(index, element) {
+        $("[name='" + element.name + "']").bootstrapSwitch({
+            size: 'sm'
+        });
     })
-    
+
 }
 
-function activateZoomButtons(){
-    $('#zoomIn').click(function(){
+function activateZoomButtons() {
+    $('#zoomIn').click(function() {
         transition_delay = 500;
         var svg = d3.select('#main_svg');
         zoom.scaleBy(svg.transition().duration(transition_delay), 1.3);
-        setTimeout(function(){
+        setTimeout(function() {
             var values = $('#outer-g').attr("transform").split(" ");
             scale = values[1];
             scale = scale.replace(/[^\d.-]/g, '');
             //scale = parseFloat(scale);
             //d3.select('#outer-g').attr("transform", transformText);
             scale = parseFloat(scale).toFixed(3);
-            scaletxt = "Scale: "+scale+"x";
+            scaletxt = "Scale: " + scale + "x";
             $('#scaleText')[0].innerHTML = scaletxt;
         }, transition_delay);
     });
-    $('#zoomOut').click(function(){
+    $('#zoomOut').click(function() {
         transition_delay = 500;
         var svg = d3.select('#main_svg');
         zoom.scaleBy(svg.transition().duration(transition_delay), 0.7);
-        setTimeout(function(){
+        setTimeout(function() {
             var values = $('#outer-g').attr("transform").split(" ");
             scale = values[1];
             scale = scale.replace(/[^\d.-]/g, '');
             //scale = parseFloat(scale);
             //d3.select('#outer-g').attr("transform", transformText);
             scale = parseFloat(scale).toFixed(3);
-            scaletxt = "Scale: "+scale+"x";
+            scaletxt = "Scale: " + scale + "x";
             $('#scaleText')[0].innerHTML = scaletxt;
         }, transition_delay);
 
@@ -125,8 +127,8 @@ function activateZoomButtons(){
     activateArrowButtons();
 }
 
-function activateArrowButtons(){
-    $('#rightarrow').click(function(){
+function activateArrowButtons() {
+    $('#rightarrow').click(function() {
         if (selectedImageIndex < imageList.length) {
             selectedImageIndex = selectedImageIndex + 1;
             selectedImageName = imageList[selectedImageIndex];
@@ -135,7 +137,7 @@ function activateArrowButtons(){
             displayImage(selectedImageId);
         }
     });
-    $('#leftarrow').click(function(){
+    $('#leftarrow').click(function() {
         if (selectedImageIndex > 0) {
             selectedImageIndex = selectedImageIndex - 1;
             selectedImageName = imageList[selectedImageIndex];
@@ -150,9 +152,9 @@ function addAnnotatorInfo() {
     $('#userTable').remove()
     content = '<table id="userTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
-        content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') + 
-         "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" + 
-          annotatorAreaOrdered[2][i] + '</td></tr>';
+        content = content + '<tr>' + "<td class='" + annotatorAreaOrdered[2][i].replace(/ /g, '') +
+            "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" +
+            annotatorAreaOrdered[2][i] + '</td></tr>';
     }
     content = content + '</table>';
     $('#annotatorInfo').append(content);
@@ -160,7 +162,7 @@ function addAnnotatorInfo() {
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
         $($('#annotatorInfo input')[i]).change(function() {
             userClass = $(this).parent()[0].className.replace('Checkbox', '');
-            $('.'+userClass).toggle();
+            $('.' + userClass).toggle();
         })
     }
     $('#userTable').easyTable();
@@ -172,18 +174,18 @@ function addColorTable() {
     $('#colorTable').remove()
     content = '<table id="colorTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
-        if (i==0) {
+        if (i == 0) {
             annotatorstxt = "1 Annotator";
         } else {
-            annotatorstxt = (i+1)+" Annotators";
+            annotatorstxt = (i + 1) + " Annotators";
         }
 
         divStr = ""
-        for(var j = 0; j<i+1; j++) {
+        for (var j = 0; j < i + 1; j++) {
             divStr = divStr + "<span class='colorBox'></span>";
         }
 
-        content = content + '<tr>' + "<td class='userColor'>"+divStr+"</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
+        content = content + '<tr>' + "<td class='userColor'>" + divStr + "</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
     }
     content = content + '</table>';
     $('#annotationColors').append(content);
@@ -203,13 +205,13 @@ function addStatsTable() {
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
         numraters = i + 1;
         ratertxt = numraters;
-        rater_plus_txt = "&ge;"+numraters;
-        i_rater_agreement = (raterNumbers[0]/segmentationArea)*100;
-        i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2)+"%";
-        i_plus_rater_agreement = (Object.values(raterNumbers).reduce(reducer)/segmentationArea)*100;
-        i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2)+"%";
+        rater_plus_txt = "&ge;" + numraters;
+        i_rater_agreement = (raterNumbers[0] / segmentationArea) * 100;
+        i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2) + "%";
+        i_plus_rater_agreement = (Object.values(raterNumbers).reduce(reducer) / segmentationArea) * 100;
+        i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2) + "%";
 
-        content = content + '<tr>' + "<td class='raterNum'>"+ratertxt+"</td><td class='calculation'>" + i_rater_agreement + '</td>'+"<td class='raterNum'>"+rater_plus_txt+"</td><td class='calculation'>" + i_plus_rater_agreement + '</td>'+'</tr>';
+        content = content + '<tr>' + "<td class='raterNum'>" + ratertxt + "</td><td class='calculation'>" + i_rater_agreement + '</td>' + "<td class='raterNum'>" + rater_plus_txt + "</td><td class='calculation'>" + i_plus_rater_agreement + '</td>' + '</tr>';
         raterNumbers.shift();
     }
     content = content + '</table>';
@@ -269,7 +271,7 @@ function getAnnotationData(studyId, imageId, feature) {
         var annotationMaskData = {};
         annotationMaskData = axios({
             method: 'get',
-            url: BASE_URL+"/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
+            url: BASE_URL + "/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
         }).then(function(response) {
             return response.data;
 
@@ -298,7 +300,7 @@ function getFeatureList(studyId, imageId) {
     var featureList = {};
     featureList = axios({
         method: 'get',
-        url: BASE_URL+"/featuresForStudyImage/" + studyId + '/' + imageId,
+        url: BASE_URL + "/featuresForStudyImage/" + studyId + '/' + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -316,16 +318,16 @@ function plotPointsOnImage(polygonPoints, count) {
             $('#userSelectedText').attr("style", "display: block;")
             userclass = this.className['baseVal'].replace("polygons ", '');
             allPolys = $('.polygons');
-            for(var i=0; i<allPolys.length; i++) {
-                    var polygon = allPolys[i];
-                    //console.log(polygon);
-                    display_status = polygon.style.display;
-                    if (display_status == 'none') {
-                        //console.log('nonez');
-                        continue;
-                    } else {
-                        polygon.style.fillOpacity = 0;
-                    }
+            for (var i = 0; i < allPolys.length; i++) {
+                var polygon = allPolys[i];
+                //console.log(polygon);
+                display_status = polygon.style.display;
+                if (display_status == 'none') {
+                    //console.log('nonez');
+                    continue;
+                } else {
+                    polygon.style.fillOpacity = 0;
+                }
             }
             $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
             $('#userSelectedText')[0].innerHTML = userclass.replace("User", "Region Annotated By User ");
@@ -345,18 +347,18 @@ function plotPointsOnImage(polygonPoints, count) {
             userclass = this.className['baseVal'].replace("polygons ", '');
             display_arr = [];
             allPolys = $('.polygons');
-            for(var i=0; i<allPolys.length; i++) {
-                    var polygon = allPolys[i];
-                    //console.log(polygon);
-                    display_status = polygon.style.display;
-                    if (display_status == 'none') {
-                        //console.log('nonez');
-                        continue;
-                    } else {
-                        polygon.style.fillOpacity = 1;
-                        polygon.style.stroke = 'none';
-                        polygon.style.fill = 'lightblue';
-                    }
+            for (var i = 0; i < allPolys.length; i++) {
+                var polygon = allPolys[i];
+                //console.log(polygon);
+                display_status = polygon.style.display;
+                if (display_status == 'none') {
+                    //console.log('nonez');
+                    continue;
+                } else {
+                    polygon.style.fillOpacity = 1;
+                    polygon.style.stroke = 'none';
+                    polygon.style.fill = 'lightblue';
+                }
             }
             clearTimeout(timer);
             numRaters = 0;
@@ -450,7 +452,7 @@ function getSegmentationData(imageId) {
     var segData = {};
     segData = axios({
         method: 'get',
-        url: BASE_URL+"/segmentation/" + imageId,
+        url: BASE_URL + "/segmentation/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -461,7 +463,7 @@ function getSegmentationArea(imageId) {
     var segArea = {};
     segArea = axios({
         method: 'get',
-        url: BASE_URL+"/segmentationArea/" + imageId,
+        url: BASE_URL + "/segmentationArea/" + imageId,
     }).then(function(response) {
         return response.data;
     });
@@ -472,7 +474,7 @@ function getUsersFromAnnotationIds() {
     var usernames = {};
     usernames = axios({
         method: 'post',
-        url: BASE_URL+"/usersFromAnnotation",
+        url: BASE_URL + "/usersFromAnnotation",
         data: annotatorAreaOrdered[1]
     }).then(function(response) {
         data = response.data;
@@ -505,15 +507,15 @@ function getClinicalInfo(imageId) {
     var info = {};
     info = axios({
         method: 'get',
-        url: BASE_URL+"/imageDetails/" + imageId,
+        url: BASE_URL + "/imageDetails/" + imageId,
     }).then(function(response) {
         return response.data;
     });
     return info;
 }
 
-function getImageMetadata(imageId){
-    getClinicalInfo(imageId).then(function(data){
+function getImageMetadata(imageId) {
+    getClinicalInfo(imageId).then(function(data) {
         imageMetadata = data;
         table_html = fullMetadataTable(data);
         $('#metadataModal').prepend(table_html);
@@ -521,42 +523,42 @@ function getImageMetadata(imageId){
     });
 }
 
-function fullMetadataTable(data){
+function fullMetadataTable(data) {
     json = data;
     var num_headers = Object.keys(json).length;
     var the_headers = Object.keys(json);
     var table_str = "<table id='metadataTable'><tr>";
-    for (var i=0; i<num_headers; i++) {
-      table_str += "<tr>";
-      table_str += "<th colspan='2'>";
-      table_str += the_headers[i];
-      table_str += "</th></tr>";
-      this_section = json[the_headers[i]];
-      section_vars = Object.keys(this_section);
-      section_vals = Object.values(this_section);
-      section_length = Object.keys(this_section).length;
-      for (var j=0; j<section_length; j++) {
+    for (var i = 0; i < num_headers; i++) {
         table_str += "<tr>";
-        table_str += "<td>";
-        table_str += section_vars[j];
-        table_str += "</td><td>";
-        table_str += section_vals[j];
-        table_str += "</td>";
-        table_str += "</tr>";
-      }
-      table_str = table_str + "</tr>";
+        table_str += "<th colspan='2'>";
+        table_str += the_headers[i];
+        table_str += "</th></tr>";
+        this_section = json[the_headers[i]];
+        section_vars = Object.keys(this_section);
+        section_vals = Object.values(this_section);
+        section_length = Object.keys(this_section).length;
+        for (var j = 0; j < section_length; j++) {
+            table_str += "<tr>";
+            table_str += "<td>";
+            table_str += section_vars[j];
+            table_str += "</td><td>";
+            table_str += section_vals[j];
+            table_str += "</td>";
+            table_str += "</tr>";
+        }
+        table_str = table_str + "</tr>";
     }
     table_str += "</table>";
     return table_str;
 }
 
-function displayClinicalTable(imageId){
-    getClinicalInfo(imageId).then(function(data){
+function displayClinicalTable(imageId) {
+    getClinicalInfo(imageId).then(function(data) {
         $('#clinicalTable').remove();
-            //imageMetadata = data;
+        //imageMetadata = data;
         all_clinical_data = data['clinical'];
 
-        
+
         var reduced_data_for_display = {};
         reduced_data_for_display['diagnosis'] = all_clinical_data['diagnosis'];
         reduced_data_for_display['benign_malignant'] = all_clinical_data['benign_malignant'];
@@ -564,18 +566,24 @@ function displayClinicalTable(imageId){
         num_entries = $('#userTable').children().children().length;
         //delete all_clinical_data['diagnosis'];
         //delete all_clinical_data['benign_malignant'];
-        
+
         console.log(all_clinical_data);
         for (var i = 0; i < num_entries; i++) {
-            if (Object.values(all_clinical_data)[i] == null) {continue;}
-            if (Object.keys(all_clinical_data)[i] == 'diagnosis' | Object.keys(all_clinical_data)[i] == 'benign_malignant') {continue;}
+            if (Object.values(all_clinical_data)[i] == null) {
+                continue;
+            }
+            if (Object.keys(all_clinical_data)[i] == 'diagnosis' | Object.keys(all_clinical_data)[i] == 'benign_malignant') {
+                continue;
+            }
             reduced_data_for_display[Object.keys(all_clinical_data)[i]] = Object.values(all_clinical_data)[i];
         }
         reduced_data_for_display['image type'] = imageMetadata['acquisition']['image_type'];
         content = '<table id="clinicalTable">';
         for (var i = 0; i < num_entries; i++) {
-            if (Object.values(reduced_data_for_display)[i] == null) {continue;}
-            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(reduced_data_for_display)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(reduced_data_for_display)[i] + '</td></tr>';
+            if (Object.values(reduced_data_for_display)[i] == null) {
+                continue;
+            }
+            content = content + '<tr>' + "<td class='clinicalKey'>" + Object.keys(reduced_data_for_display)[i] + "</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(reduced_data_for_display)[i] + '</td></tr>';
         }
 
         content = content + '</table>';
@@ -612,17 +620,17 @@ function displayImage(imageId) {
     });
     d3.select('#outer-g').attr("transform", "translate(0,0) scale(1)");
     plotSegmentation(imageId);
-    
+
     var svg = d3.select('#main_svg');
     zoom.scaleTo(svg.transition(), 0.2);
-/*    if(!showArrows) {
-        d3.select('#leftarrow').attr('style', 'display: none');
-        d3.select('#rightarrow').attr('style', 'display: none');
-    } else {
-        d3.select('#leftarrow').attr('style', 'display: block');
-        d3.select('#rightarrow').attr('style', 'display: block')
-    }
-    showArrows = true;*/
+    /*    if(!showArrows) {
+            d3.select('#leftarrow').attr('style', 'display: none');
+            d3.select('#rightarrow').attr('style', 'display: none');
+        } else {
+            d3.select('#leftarrow').attr('style', 'display: block');
+            d3.select('#rightarrow').attr('style', 'display: block')
+        }
+        showArrows = true;*/
 }
 
 function getCoords(place) {
@@ -692,16 +700,16 @@ function createImageMenu() {
                     selectedImageId = value['_id'];
                 }
             });
-            if(selectedImageIndex==0) {
+            if (selectedImageIndex == 0) {
                 console.log('0');
                 d3.select('#leftarrow').attr('style', 'display: none');
                 d3.select('#rightarrow').attr('style', 'display: block');
-            } 
-            if(selectedImageIndex>0 & selectedImageIndex<(imageList.length-1)) {
+            }
+            if (selectedImageIndex > 0 & selectedImageIndex < (imageList.length - 1)) {
                 d3.select('#leftarrow').attr('style', 'display: block');
                 d3.select('#rightarrow').attr('style', 'display: block');
             }
-            if(selectedImageIndex==(imageList.length-1)) {
+            if (selectedImageIndex == (imageList.length - 1)) {
                 d3.select('#rightarrow').attr('style', 'display: none');
                 d3.select('#leftarrow').attr('style', 'display: block');
             }
@@ -763,7 +771,7 @@ function getStudyList() {
     var studyList = {};
     studyList = axios({
         method: 'get',
-        url: BASE_URL+"/studyList",
+        url: BASE_URL + "/studyList",
     }).then(function(response) {
         return response.data;
     });
@@ -774,7 +782,7 @@ function getImageList(studyId) {
     var imageList = {};
     imageList = axios({
         method: 'get',
-        url: BASE_URL+"/imageList/" + studyId,
+        url: BASE_URL + "/imageList/" + studyId,
     }).then(function(response) {
         return response.data;
     });
