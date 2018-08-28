@@ -150,12 +150,18 @@ def getUsersFromAnnotation():
 
 @app.route("/imageDetails/<image_id>")
 def retrieveImageDetails(image_id):
+	imageDetailsClean = {};
 	url = BASE_URL + ISIC_IMAGE_ENDPOINT + '/' + image_id
 	imageDetails = retrieveData(url)
-	imageDetails_min = imageDetails['meta']['clinical']
-	imageDetails_min['image_type'] = imageDetails['meta']['acquisition']['image_type']
-	imageDetails_min.pop('melanocytic', None)
-	return imageDetails_min
+	imageDetailsClean['dataset'] = imageDetails['dataset']
+	imageDetailsClean['acquisition'] = imageDetails['meta']['acquisition']
+	imageDetailsClean['clinical'] = imageDetails['meta']['clinical']
+	imageDetailsClean['image'] = {}
+	imageDetailsClean['image']['name'] = imageDetails['name']
+	imageDetailsClean['image']['_id'] = image_id
+	imageDetailsClean['dataset'].pop('updated', None)
+	imageDetailsClean['dataset'].pop('_accessLevel', None)
+	return imageDetailsClean
 
 @app.route("/studyList")
 def retrieveStudyList():

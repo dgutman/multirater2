@@ -24,6 +24,7 @@ var numRaters;
 var annotatorAreaOrdered;
 var selectedImageIndex;
 var showArrows = true;
+var imageMetadata;
 
 const BASE_URL = "http://localhost:8080"
 
@@ -502,37 +503,73 @@ function getClinicalInfo(imageId) {
     return info;
 }
 
+function getImageMetadata(imageId){
+    getClinicalInfo(imageId).then(function(data){
+        imageMetadata = data;
+    });
+}
+
+function fullMetadataTable(){
+    json = imageMetadata;
+    var num_headers = Object.keys(json).length;
+    var the_headers = Object.keys(json);
+    var table_str = "<table><tr>";
+    for (var i=0; i<num_headers; i++) {
+      table_str += "<tr>";
+      table_str += "<th colspan='2'>";
+      table_str += the_headers[i];
+      table_str += "</th></tr>";
+      this_section = json[the_headers[i]];
+      section_vars = Object.keys(this_section);
+      section_vals = Object.values(this_section);
+      section_length = Object.keys(this_section).length;
+      for (var j=0; j<section_length; j++) {
+        table_str += "<tr>";
+        table_str += "<td>";
+        table_str += section_vars[j];
+        table_str += "</td><td>";
+        table_str += section_vals[j];
+        table_str += "</td>";
+        table_str += "</tr>";
+      }
+      table_str = table_str + "</tr>";
+    }
+    table_str += "</table>";
+}
+
 function displayClinicalTable(imageId){
     getClinicalInfo(imageId).then(function(data){
         $('#clinicalTable').remove();
-        var newdata = {};
-        newdata['diagnosis'] = data['diagnosis'];
-        delete data['diagnosis'];
-        newdata['benign_malignant'] = data['benign_malignant'];
-        delete data['benign_malignant'];
+            //imageMetadata = data;
+        all_clinical_data = data['clinical'];
+
+        
+        var reduced_data_for_display = {};
+        reduced_data_for_display['diagnosis'] = all_clinical_data['diagnosis'];
+        reduced_data_for_display['benign_malignant'] = all_clinical_data['benign_malignant'];
+        console.log(reduced_data_for_display);
         num_entries = $('#userTable').children().children().length;
+        //delete all_clinical_data['diagnosis'];
+        //delete all_clinical_data['benign_malignant'];
+        
+        console.log(all_clinical_data);
         for (var i = 0; i < num_entries; i++) {
-            if (Object.values(data)[i] == null) {continue;}
-            newdata[Object.keys(data)[i]] = Object.values(data)[i];
+            if (Object.values(all_clinical_data)[i] == null) {continue;}
+            if (Object.keys(all_clinical_data)[i] == 'diagnosis' | Object.keys(all_clinical_data)[i] == 'benign_malignant') {continue;}
+            reduced_data_for_display[Object.keys(all_clinical_data)[i]] = Object.values(all_clinical_data)[i];
         }
-
-
-        //table_elements = annotatorAreaOrdered[0].length;
-        console.log(data);
-        console.log(newdata);
-
+        reduced_data_for_display['image type'] = imageMetadata['acquisition']['image_type'];
         content = '<table id="clinicalTable">';
         for (var i = 0; i < num_entries; i++) {
-            if (Object.values(newdata)[i] == null) {continue;}
-            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(newdata)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(newdata)[i] + '</td></tr>';
-            //table.append(row);
+            if (Object.values(reduced_data_for_display)[i] == null) {continue;}
+            content = content + '<tr>' + "<td class='clinicalKey'>"+ Object.keys(reduced_data_for_display)[i] +"</td><td class='userColor'></td><td class='clinicalData'>" + Object.values(reduced_data_for_display)[i] + '</td></tr>';
         }
+
         content = content + '</table>';
         $('#clinicalInformation').append(content);
-
         $('#clinicalTable').easyTable();
         $('#easyMenuTable').remove();
-    })
+    });
 }
 
 function displayImage(imageId) {
@@ -655,6 +692,7 @@ function createImageMenu() {
                 d3.select('#leftarrow').attr('style', 'display: block');
             }
             displayImage(selectedImageId);
+            getImageMetadata(selectedImageId);
         })
     });
 }
