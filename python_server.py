@@ -21,7 +21,6 @@ PORT = 8080
 HOST = HOST_ADDRESS + ':' + str(PORT)
 DIVISOR = 10
 
-
 def url_to_image(url):
     resp = urllib.request.urlopen(url)  # download image
     image = np.asarray(bytearray(resp.read()), dtype='uint8')  # convert to numpy array
@@ -37,7 +36,6 @@ def getContours(image, segmentation):
     contours = cv2.findContours(gray.copy(), retrievalMode, cv2.CHAIN_APPROX_NONE)  # cv2.CHAIN_APPROX_SIMPLE) #find the contours
     contours = (contours[0] if imutils.is_cv2() else contours[1])  # adjust for opencv version
     return contours  # return the contours as list of arrays
-
 
 def retrievePixelDataAsJson(contour_data):
     pixel_data = {}  # create empty dictionary
@@ -59,7 +57,6 @@ def retrieveData(url):
 
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
 def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
-    
     feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
     combined_pixel_data = {}
     url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
@@ -72,14 +69,6 @@ def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
         url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotation_id \
             + '/' + feature2 + '/mask'
         image = url_to_image(url)  # get image
-        # contour_data = getContours(image, segmentation=False)  # get contours
-        # area = np.where(image != 0)
-        # area = json.dumps(area[0].size)
-        # if area == '0':
-        #     continue
-        # pixelJson = retrievePixelDataAsJson(contour_data)  # convert to json
-        # combined_pixel_data[annotation_id] = pixelJson
-        # combined_pixel_data[annotation_id + '_area'] = area
         if counter != 0:
             img_matrix = np.add(img_matrix, image, dtype=np.float)
         else:
@@ -88,15 +77,13 @@ def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
             combined_pixel_data['width'] = img_w
             combined_pixel_data['height'] = img_h
         counter = counter + 1
-
-
     tmp_img = img_matrix
     for count in range(2, numRaters+1):
-        print(count)
         img_matrix = tmp_img
         img_matrix = img_matrix / 255
         img_matrix[img_matrix < count] = 0
-        img_matrix[img_matrix >= count] = 255
+        if np.amax(img_matrix) == 0:
+        	continue
         img_matrix = np.uint8(img_matrix.astype(int))
         contour_data = getContours(img_matrix, segmentation=False)
         pixelJson = retrievePixelDataAsJson(contour_data)
@@ -144,7 +131,6 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
     combined_pixel_data['multiraterMatrix'] = img_matrix_json
     return combined_pixel_data
 
-
 @app.route('/featuresForStudyImage/<study_id>/<image_id>')
 def retrieveFeaturesForStudyImage(study_id, image_id):
     url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
@@ -169,7 +155,6 @@ def retrieveFeaturesForStudyImage(study_id, image_id):
     featureJson = json.dumps(feat_dict)
     return featureJson
 
-
 @app.route('/segmentation/<image_id>')
 def retrieveSegmentationMask(image_id):
     url = BASE_URL + ISIC_SEGMENTATION_ENDPOINT + '?imageId=' + image_id  # create url for ISIC segmentation endpoint
@@ -181,7 +166,6 @@ def retrieveSegmentationMask(image_id):
     contour_data = getContours(image, segmentation=True)  # get contours
     pixelJson = retrievePixelDataAsJson(contour_data)  # convert to json
     return pixelJson
-
 
 @app.route('/segmentationArea/<image_id>')
 def retrieveSegmentationArea(image_id):
@@ -195,7 +179,6 @@ def retrieveSegmentationArea(image_id):
     area = json.dumps(area[0].size)
     return area
 
-
 @app.route('/usersFromAnnotation', methods=['POST'])
 def getUsersFromAnnotation():
     req_data = request.get_json()
@@ -208,15 +191,13 @@ def getUsersFromAnnotation():
         usernames.append(user_name)
     return str(usernames)
 
-
 @app.route('/imageDetails/<image_id>')
 def retrieveImageDetails(image_id):
     imageDetailsClean = {}
     url = BASE_URL + ISIC_IMAGE_ENDPOINT + '/' + image_id
     imageDetails = retrieveData(url)
     imageDetailsClean['dataset'] = imageDetails['dataset']
-    imageDetailsClean['acquisition'] = imageDetails['meta'
-            ]['acquisition']
+    imageDetailsClean['acquisition'] = imageDetails['meta']['acquisition']
     imageDetailsClean['clinical'] = imageDetails['meta']['clinical']
     imageDetailsClean['image'] = {}
     imageDetailsClean['image']['name'] = imageDetails['name']
@@ -225,20 +206,17 @@ def retrieveImageDetails(image_id):
     imageDetailsClean['dataset'].pop('_accessLevel', None)
     return imageDetailsClean
 
-
 @app.route('/studyList')
 def retrieveStudyList():
     url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
     studyList = retrieveData(url)
     return studyList
 
-
 @app.route('/imageList/<study_id>')
 def retrieveImageList(study_id):
     url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
     imageList = retrieveData(url)
     return imageList
-
 
 @app.route('/')
 def main():
