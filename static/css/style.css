@@ -7,6 +7,17 @@
 }
 img {
 }
+
+#infoPanel {
+    width: 23%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: black;
+    opacity: 0.6;
+    display: none;
+}
+
  #menubar {
      height: 60px;
      border-bottom-width: 1px;
@@ -19,7 +30,7 @@ img {
      padding-top: 20px;
      width: 100%;
 }
-
+}
  .main-header-logo {
      color: #353940;
      font-size: 20px;

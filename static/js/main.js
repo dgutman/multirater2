@@ -69,7 +69,7 @@ $(document).ready(function() {
             displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
         }
     });
-    addViewerInfo();
+    
     activateZoomButtons();
     $('[data-toggle="tooltip"]').tooltip();
     $('#openClinicalButton').click(function() {
@@ -84,7 +84,8 @@ $(document).ready(function() {
             $.modal.close();
         });
     });
-
+    d3.select('#viewer').append('div').attr('id', 'infoPanel');
+    addViewerInfo();
 
 })
 
@@ -217,7 +218,10 @@ function addStatsTable() {
         i_plus_rater_agreement = (Object.values(raterNumbers).reduce(reducer) / segmentationArea) * 100;
         i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2) + "%";
 
-        content = content + '<tr>' + "<td class='raterNum'>" + ratertxt + "</td><td class='calculation'>" + i_rater_agreement + '</td>' + "<td class='raterNum'>" + rater_plus_txt + "</td><td class='calculation'>" + i_plus_rater_agreement + '</td>' + '</tr>';
+        content = content + '<tr>' + "<td class='raterNum'>" + ratertxt + "</td>"+
+                                     "<td class='calculation'>" + i_rater_agreement + '</td>' + 
+                                     "<td class='raterNum'>" + rater_plus_txt + "</td>" +
+                                     "<td class='calculation'>" + i_plus_rater_agreement + '</td>' + '</tr>';
         raterNumbers.shift();
     }
     content = content + '</table>';
@@ -232,31 +236,21 @@ function addViewerInfo() {
         .append('svg')
         .attr('id', 'newg')
 
-    d3.select('#newg').append('text')
+    d3.select('#infoPanel').append('p')
         .text("Number of Raters at Cursor: ")
         .attr('id', 'numRatersText')
         .attr('class', 'ratersInfo')
-        .attr('x', '2%')
-        .attr('y', '9%')
-        .attr('fill', 'black')
         .attr('display', 'none')
         .attr('font-size', '14px')
-
-    d3.select('#newg').append('text')
+        .append('span')
         .text(" ")
         .attr('id', 'numRatersNum')
         .attr('class', 'ratersInfo')
-        .attr('x', '18%')
-        .attr('y', '9%')
-        .attr('fill', 'black')
         .attr('display', 'none')
 
-    d3.select('#newg').append('text')
+    d3.select('#infoPanel').append('p')
         .text("User VDSM")
         .attr('id', 'userSelectedText')
-        .attr('x', '2%')
-        .attr('y', '95%')
-        .attr('fill', 'black')
         .attr('font-size', '14px')
         .attr('display', 'none')
 
