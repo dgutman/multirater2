@@ -7,7 +7,21 @@
 }
 img {
 }
-
+.select2-selection.select2-selection--single {
+    border-color: transparent !important;
+}
+.select2-container {
+    box-sizing: border-box;
+    display: inline-block;
+    margin-right: 22px !important;
+    position: relative;
+    vertical-align: middle;
+}
+.select2-container--default .select2-selection--single {
+    background-color: #fff;
+    border: 1px solid cornflowerblue !important;
+    border-radius: 0px !important;
+}
 #infoPanel {
     width: 23%;
     height: 100%;
@@ -60,10 +74,9 @@ img {
      min-width: 150px;
 }
  .selectorNum {
-     border-radius: 50%;
      width: 36px;
      height: 36px;
-     padding: 8px 16px;
+     padding: 1px 10px;
      background: #fff;
      border: 2px solid cornflowerblue;
      color: cornflowerblue;
@@ -74,7 +87,7 @@ img {
  .select2 {
      min-width: 150px;
      margin-top: -10px !important;
-     margin-right: 4px !important;
+     margin-right: 24px !important;
 }
  #loadingDiv {
      position: absolute;
