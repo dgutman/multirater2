@@ -36,11 +36,27 @@
                   <select id="imageSelector" class="selector"></select>
                   <span class="selectorNum">3</span>
                   <select id="featureSelector" class="selector"></select>
+
                </div>
             </div>
          </div>
          <div class="row" id="viewerContainer">
             <div class="col-lg-12" id="viewer">
+                <div id="infoPanel">
+        <div class="switch-toggle switch-candy large-9 columns">
+              <input id="d-c1" name="view-d-c" type="radio" checked="">
+              <label for="d-c1" onclick="">Single-Rater</label>
+
+              <input id="d-c2" name="view-d-c" type="radio">
+              <label for="d-c2" onclick="">Agreement Area</label>
+
+              
+              
+
+              <a></a>
+            </div>
+                    
+                </div>
                <span id="scaleText">Scale: 1x</span>
                <div id="zoomDiv">
                   <a href="#" data-toggle="tooltip" title="Using scroll to zoom is usually more efficient!">
@@ -101,6 +117,9 @@
       <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/prettydropdowns.css')}}">
       <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/select2.min.css')}}"/>
       <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery.modal.min.css')}}" />
+
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/css-toggle-switch@latest/dist/toggle-switch.css" />
+
      
    </body>
 </html>

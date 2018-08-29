@@ -85,7 +85,7 @@ $(document).ready(function() {
             $.modal.close();
         });
     });
-    d3.select('#viewer').append('div').attr('id', 'infoPanel');
+    //d3.select('#viewer').append('div').attr('id', 'infoPanel');
     addViewerInfo();
 
 })
