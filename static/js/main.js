@@ -26,6 +26,7 @@ var selectedImageIndex;
 var showArrows = true;
 var imageMetadata;
 var table_html;
+var multiraterMode = false;
 
 const BASE_URL = "http://localhost:8080"
 
@@ -305,6 +306,10 @@ function getFeatureList(studyId, imageId) {
         return response.data;
     });
     return featureList;
+}
+
+function plotMultirater(polygonPoints) {
+    plotPointsOnImage(polygonPoints, 0);
 }
 
 function plotPointsOnImage(polygonPoints, count) {

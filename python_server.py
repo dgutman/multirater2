@@ -28,7 +28,6 @@ def url_to_image(url):
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)  # convert to opencv format
     return image  # return image in opencv format
 
-
 def getContours(image, segmentation):
     if segmentation == True:
         retrievalMode = cv2.RETR_EXTERNAL
@@ -52,13 +51,57 @@ def retrievePixelDataAsJson(contour_data):
     json_data = json.dumps(pixel_data)  # convert dictionary to json
     return json_data  # return data as json
 
-
 def retrieveData(url):
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
     data = json.loads(resp)
     return data
 
+@app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
+def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
+    
+    feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
+    combined_pixel_data = {}
+    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
+        + '&imageId=' + image_id + '&state=complete'  # create url for ISIC annotation mask endpoint
+    annotationData = retrieveData(url)
+    annotation_ids = [annotation['_id'] for annotation in annotationData]
+    numRaters = len(annotation_ids)
+    counter = 0
+    for annotation_id in annotation_ids:
+        url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotation_id \
+            + '/' + feature2 + '/mask'
+        image = url_to_image(url)  # get image
+        # contour_data = getContours(image, segmentation=False)  # get contours
+        # area = np.where(image != 0)
+        # area = json.dumps(area[0].size)
+        # if area == '0':
+        #     continue
+        # pixelJson = retrievePixelDataAsJson(contour_data)  # convert to json
+        # combined_pixel_data[annotation_id] = pixelJson
+        # combined_pixel_data[annotation_id + '_area'] = area
+        if counter != 0:
+            img_matrix = np.add(img_matrix, image, dtype=np.float)
+        else:
+            img_matrix = image
+            (img_h, img_w) = image.shape[:2]
+            combined_pixel_data['width'] = img_w
+            combined_pixel_data['height'] = img_h
+        counter = counter + 1
+
+
+    tmp_img = img_matrix
+    for count in range(2, numRaters+1):
+        print(count)
+        img_matrix = tmp_img
+        img_matrix = img_matrix / 255
+        img_matrix[img_matrix < count] = 0
+        img_matrix[img_matrix >= count] = 255
+        img_matrix = np.uint8(img_matrix.astype(int))
+        contour_data = getContours(img_matrix, segmentation=False)
+        pixelJson = retrievePixelDataAsJson(contour_data)
+        combined_pixel_data[str(count)] = pixelJson
+    return combined_pixel_data
 
 @app.route('/annotationMasks/<study_id>/<image_id>/<feature>')
 def retrieveAnnotationMasks(study_id, image_id, feature):
@@ -89,6 +132,7 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
         counter = counter + 1
     img_matrix_flat = img_matrix.flatten()
     img_matrix_flat = img_matrix_flat / 255
+    #print(np.amax(img_matrix_flat))
     img_matrix_fl = {}
     img_matrix_fl['width'] = img_w
     img_matrix_fl['height'] = img_h
