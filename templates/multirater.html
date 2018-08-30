@@ -49,14 +49,11 @@
                     <p>Select Highlighting Mode: </p>
                     <div class="switch-toggle switch-candy large-9 columns" id="multiraterToggle">
                         <input id="d-c1" name="view-d-c" type="radio" checked="">
-                        <label for="d-c1" onclick="multiraterMode = false; convertToMultiraterMode(multiraterMode);">Single-Rater</label>
-
+                        <label for="d-c1" onclick="multiraterMode = false; toggleMultiraterMode(multiraterMode);">Single-Rater</label>
                         <input id="d-c2" name="view-d-c" type="radio">
-                        <label for="d-c2" onclick="multiraterMode = true; convertToMultiraterMode(multiraterMode);">Agreement Area</label>
-
+                        <label for="d-c2" onclick="multiraterMode = true; toggleMultiraterMode(multiraterMode);">Agreement Area</label>
                         <a></a>
                     </div>
-
                 </div>
                 <span id="scaleText">Scale: 1x</span>
                 <div id="zoomDiv">
