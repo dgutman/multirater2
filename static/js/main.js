@@ -67,7 +67,12 @@ $(document).ready(function() {
 
         selectedFeature = this.value.substring(0, this.value.lastIndexOf(' '));
         if (selectedFeature != "") {
-            displayAnnotation(selectedFeature.replace("/", "_").replace(":", "%3A"));
+            selectedFeature = selectedFeature.replace("/", "_").replace(":", "%3A");
+            if (!multiraterMode) {
+                displayAnnotation(selectedFeature);
+            } else {
+                displayMultiraterAnnotation(selectedFeature);
+            }
         }
     });
     
@@ -91,12 +96,11 @@ $(document).ready(function() {
 })
 
 function activateSwitches() {
-    $('input').each(function(index, element) {
+    $('table input').each(function(index, element) {
         $("[name='" + element.name + "']").bootstrapSwitch({
             size: 'sm'
         });
     })
-
 }
 
 function activateZoomButtons() {
@@ -275,11 +279,23 @@ function getAnnotationData(studyId, imageId, feature) {
             url: BASE_URL + "/annotationMasks/" + studyId + "/" + imageId + "/" + feature,
         }).then(function(response) {
             return response.data;
-
         });
     }
     return annotationMaskData;
 
+}
+
+function getMultiraterAnnotationData(studyId, imageId, feature) {
+    if (feature != "") {
+        var annotationMaskData = {};
+        annotationMaskData = axios({
+            method: 'get',
+            url: BASE_URL + "/multiraterAnnotationMasks/" + studyId + "/" + imageId + "/" + feature,
+        }).then(function(response) {
+            return response.data;
+        });
+    }
+    return annotationMaskData;
 }
 
 function createFeatureMenu() { //need to clear feature menu
@@ -310,6 +326,14 @@ function getFeatureList(studyId, imageId) {
 
 function plotMultirater(polygonPoints) {
     plotPointsOnImage(polygonPoints, 0);
+}
+
+function plotMultiraterPointsOnImage(){
+
+}
+
+function toggleMultiraterMode(multiraterMode) {
+
 }
 
 function plotPointsOnImage(polygonPoints, count) {
@@ -433,6 +457,50 @@ function displayAnnotation(selectedFeature) {
 
             $('#hiddenTables').attr("style", "display: flex");
         })
+    })
+}
+
+function displayMultiraterAnnotation(selectedFeature) {
+    //var polygonPoints;
+    //annotatorAreaOrdered = [];
+    $('#inner-g').children().remove();
+    //console.log(selectedFeature);
+    d3.select('#loadingDiv').attr("style", "display:block");
+    getMultiraterAnnotationData(selectedStudyId, selectedImageId, selectedFeature).then(function(data) {
+        //annotatorAreaOrdered = [];
+        combinedAnnotationData = data;
+
+        origImgWidth = combinedAnnotationData['width'];
+        origImgHeight = combinedAnnotationData['height'];
+
+        //var keyNames = Object.keys(combinedAnnotationData);
+        //annotatorAreaOrdered = sortJsObject(combinedAnnotationData);
+
+            var keyNames = Object.keys(combinedAnnotationData);
+            //keyNames = keyNames.reverse();
+            for (var i = 0; i < keyNames.length; i++) {
+            //    if (keyNames[i].indexOf("area") != -1) {
+            //        continue;
+            //    }
+                //if (annotatorAreaOrdered[0][i] != "0") {continue;}
+                var polygonPointString = combinedAnnotationData[keyNames[i]];
+                polygonPointJson = JSON.parse(polygonPointString);
+                console.log(polygonPointJson);
+                //for (var j = 0; j < Object.keys(polygonPointJson).length; j++) {
+                polygonPoints = polygonPointJson['0'];
+                //    if (polygonPoints.length > 10) {
+                plotMultirater(polygonPoints);
+                //    }
+                //}
+            }
+            d3.select('#loadingDiv').attr("style", "display:none");
+            //displayClinicalTable(selectedImageId);
+            //addAnnotatorInfo();
+            //addColorTable();
+            //addStatsTable();
+
+            //$('#hiddenTables').attr("style", "display: flex");
+        
     })
 }
 

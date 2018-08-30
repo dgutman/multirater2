@@ -31,6 +31,28 @@ img {
     opacity: 0.6;
     /*display: none;*/
 }
+#numRatersText {
+    margin-top: 10px;
+}
+
+#infoPanel p{
+    color: white;
+    padding: 5px;
+    padding-left: 10px;
+}
+
+#multiraterToggle {
+    height: 45px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: -15px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#multiraterToggle label {
+    padding-top: 10px;
+}
 
  #menubar {
      height: 60px;
@@ -44,15 +66,15 @@ img {
      padding-top: 20px;
      width: 100%;
 }
-}
+
  .main-header-logo {
      color: #353940;
-     font-size: 20px;
-     font-weight: 700;
+     font-size: 16px;
+     font-weight: 400;
      letter-spacing: 1px;
      line-height: 16px;
      cursor: pointer;
-     margin-right: 40px;
+     margin-right: 20px !important;
 }
  .header-menu-item a {
      width: auto;
