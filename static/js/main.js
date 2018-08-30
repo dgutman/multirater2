@@ -324,15 +324,76 @@ function getFeatureList(studyId, imageId) {
     return featureList;
 }
 
-function plotMultirater(polygonPoints) {
-    plotPointsOnImage(polygonPoints, 0);
+function plotMultirater(polygonPoints, keyName) {
+    plotMultiraterPointsOnImage(polygonPoints, keyName);
 }
 
-function plotMultiraterPointsOnImage(){
-
+function plotMultiraterPointsOnImage(polygonPoints, keyName){
+    var img_g = d3.select('#inner-g');
+    img_g.append('polygon')
+        .attr('points', polygonPoints)
+        .attr('class', 'polygons' + ' ' + keyName+'Rater')
+        .on("mouseover", function() {
+            $('.ratersInfo').attr("style", "display: block;")
+            $('#userSelectedText').attr("style", "display: block;")
+            userclass = this.className['baseVal'].replace("polygons ", '');
+            allPolys = $('.polygons');
+            for (var i = 0; i < allPolys.length; i++) {
+                var polygon = allPolys[i];
+                //console.log(polygon);
+                display_status = polygon.style.display;
+                if (display_status == 'none') {
+                    //console.log('nonez');
+                    continue;
+                } else {
+                    polygon.style.fillOpacity = 0;
+                    //polygon.style.stroke = 'black';
+                }
+            }
+            $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
+            
+            userclass = userclass.replace("Rater", ' or more raters');
+            //userclass = '&geq;'+userclass;
+            $('#userSelectedText')[0].innerHTML = userclass;
+        })
+        .on("mouseout", function() {
+            //userclass = this.className['baseVal'].replace("polygons ", '');
+            //userclass = userclass.replace("Rater", ' Rater');
+            display_arr = [];
+            allPolys = $('.polygons');
+            for (var i = 0; i < allPolys.length; i++) {
+                var polygon = allPolys[i];
+                //console.log(polygon);
+                display_status = polygon.style.display;
+                if (display_status == 'none') {
+                    //console.log('nonez');
+                    continue;
+                } else {
+                    polygon.style.fillOpacity = 1;
+                    polygon.style.stroke = 'none';
+                    polygon.style.fill = 'lightblue';
+                }
+            }
+            clearTimeout(timer);
+            numRaters = 0;
+            $('#userSelectedText')[0].innerHTML = "";
+        })
 }
 
 function toggleMultiraterMode(multiraterMode) {
+    if (multiraterMode) {
+        $('#numRatersText')[0].innerHTML = "Outlined area at cursor was annotated by: ";
+        if (selectedFeature != "") {
+            displayMultiraterAnnotation(selectedFeature);
+        }
+        //clear polygons and plot new multirater ones
+    } else {
+        $('#numRatersText')[0].innerHTML = "Number of Raters at Cursor: ";
+        if (selectedFeature != "") {
+            displayAnnotation(selectedFeature);
+        }
+        //clear polygons and plot single rater ones
+    }
 
 }
 
@@ -489,7 +550,7 @@ function displayMultiraterAnnotation(selectedFeature) {
                 //for (var j = 0; j < Object.keys(polygonPointJson).length; j++) {
                 polygonPoints = polygonPointJson['0'];
                 //    if (polygonPoints.length > 10) {
-                plotMultirater(polygonPoints);
+                plotMultiraterPointsOnImage(polygonPoints, keyNames[i]);
                 //    }
                 //}
             }

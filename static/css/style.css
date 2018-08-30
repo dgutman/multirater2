@@ -34,7 +34,6 @@ img {
 #numRatersText {
     margin-top: 10px;
 }
-
 #infoPanel p{
     color: white;
     padding: 5px;
@@ -52,6 +51,7 @@ img {
 
 #multiraterToggle label {
     padding-top: 10px;
+    padding-bottom: 5px;
 }
 
  #menubar {
