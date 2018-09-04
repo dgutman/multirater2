@@ -182,6 +182,32 @@ function addAnnotatorInfo() {
     activateSwitches();
 }
 
+function addAnnotatorInfoMultirater() {
+    $('#userTable').remove()
+    var polygonClassText = $('#inner-g').children().last().attr("class");
+    polygonClassText = polygonClassText.replace('polygons ', '');
+    polygonClassText = polygonClassText.replace('Rater', '');
+    var numRaters = parseInt(polygonClassText);
+    content = '<table id="userTable">';
+    for (var i = 2; i < numRaters+1; i++) {
+        content = content + '<tr>' + "<td class='" + i + 'Rater' +
+            "Checkbox'><input type='checkbox' name='box" + i + "' value='on' checked></td><td class='userColor'></td><td class='userName'>" +
+            i + " Raters" + '</td></tr>';
+    }
+    content = content + '</table>';
+    $('#annotatorInfo').append(content);
+
+    for (var i = 0; i < Object.keys(combinedAnnotationData).length/2; i++) {
+        $($('#annotatorInfo input')[i]).change(function() {
+            userClass = $(this).parent()[0].className.replace('Checkbox', '');
+            $('.' + userClass).toggle();
+        })
+    }
+    $('#userTable').easyTable();
+    $('#easyMenuTable').remove();
+    activateSwitches();
+}
+
 function addColorTable() {
     $('#colorTable').remove()
     content = '<table id="colorTable">';
@@ -236,6 +262,56 @@ function addStatsTable() {
 
 }
 
+function addMRColorTable() {
+    $('#colorTable').remove()
+    content = '<table id="colorTable">';
+    for (var i = 0; i < Object.keys(combinedAnnotationData).length/2; i++) {
+            annotatorstxt = (i + 2) + " Annotators";
+
+        divStr = ""
+        for (var j = 0; j < i + 1; j++) {
+            divStr = divStr + "<span class='colorBox'></span>";
+        }
+
+        content = content + '<tr>' + "<td class='userColor'>" + divStr + "</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
+    }
+    content = content + '</table>';
+    $('#annotationColors').append(content);
+    $('#colorTable').easyTable();
+    $('#easyMenuTable').remove();
+}
+
+function addMRStatsTable() {
+    //raterNumbers = multiraterMatrix;
+    //delete raterNumbers['height'];
+    //delete raterNumbers['width'];
+    //raterNumbers = Object.values(raterNumbers);
+
+    $('#statsTable').remove();
+    area_keys = Object.keys(combinedAnnotationData).filter(function(x){if (x.includes("area")) {return x}});
+    content = '<table id="statsTable">';
+    for (var i = 0; i < area_keys.length; i++) {
+        numraters = i + 2;
+        ratertxt = numraters;
+        rater_plus_txt = "&ge;" + numraters;
+        //i_rater_agreement = (raterNumbers[0] / segmentationArea) * 100;
+        //i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2) + "%";
+        i_plus_rater_agreement = (combinedAnnotationData[area_keys[i]] / segmentationArea) * 100;
+        i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2) + "%";
+
+        content = content + '<tr>' + //"<td class='raterNum'>" + ratertxt + "</td>"+
+                                     //"<td class='calculation'>" + i_rater_agreement + '</td>' + 
+                                     "<td class='raterNum'>" + rater_plus_txt + "</td>" +
+                                     "<td class='calculation'>" + i_plus_rater_agreement + '</td>' + '</tr>';
+        //raterNumbers.shift();
+    }
+    content = content + '</table>';
+    $('#statsInformation').append(content);
+    $('#statsTable').easyTable();
+    $('#easyMenuTable').remove();
+
+}
+
 function addViewerInfo() {
     d3.select('#main_svg')
         .append('svg')
@@ -254,11 +330,22 @@ function addViewerInfo() {
         .attr('display', 'none')
 
     d3.select('#infoPanel').append('p')
-        .text("User VDSM")
+        .text(" ")
         .attr('id', 'userSelectedText')
         .attr('font-size', '14px')
         .attr('display', 'none')
 
+    d3.select('#infoPanel').append('p')
+        .text("Region also annotated by: ")
+        .attr('id', 'regiontext')
+        .attr('font-size', '14px')
+        .attr('display', 'none')
+
+    d3.select('#infoPanel').append('p')
+        .text(" ")
+        .attr('id', 'otherAnnotatorsText')
+        .attr('font-size', '14px')
+        .attr('display', 'none')
 }
 
 function activateLoader() {
@@ -356,6 +443,43 @@ function plotMultiraterPointsOnImage(polygonPoints, keyName){
             //userclass = '&geq;'+userclass;
             $('#userSelectedText')[0].innerHTML = userclass;
         })
+        /*.on("mousemove", function() {
+            timer = setTimeout(function() {
+                numRaters = 0;
+                var polys = $('.polygons');
+                var raterArray = [];
+                for (var i = 0; i < polys.length; i++) {
+                    //console.log(polys[i]);
+                    var arr = makeArr(polys[i]);
+
+                    var inPolygon = d3.polygonContains(arr, unscaledCoords);
+                    if (inPolygon) {
+                        var user = polys[i].className['baseVal'].replace('polygons ', '');
+                        user = user.replace('User', 'User ');
+                        raterArray.push(user);
+                    } 
+                    //numRaters = numRaters + inPolygon;
+                }
+                //$('#numRatersNum')[0].innerHTML = numRaters;
+                $('#otherAnnotatorsText')[0].innerHTML = "";
+                //console.log(userclass);
+                //var userclass = this.className['baseVal'].replace("polygons ", '');
+                numRaters = raterArray.length;
+                //console.log(raterArray);
+                if (numRaters > 1) {
+                    for (var i=0; i<raterArray.length; i++) {
+                        //console.log(raterArray[i] != userclass);
+                        //if (raterArray[i] != userclass) {
+                        //    console.log(raterArray[i], userclass);
+                        $('#otherAnnotatorsText')[0].innerHTML = $('#otherAnnotatorsText')[0].innerHTML  + raterArray[i] + "<br>";
+                        //}
+                    }
+                } else if (numRaters==1) {
+                    $('#otherAnnotatorsText')[0].innerHTML = "None";
+                }
+
+            }, 600);
+        })*/
         .on("mouseout", function() {
             //userclass = this.className['baseVal'].replace("polygons ", '');
             //userclass = userclass.replace("Rater", ' Rater');
@@ -386,6 +510,10 @@ function toggleMultiraterMode(multiraterMode) {
         if (selectedFeature != "") {
             displayMultiraterAnnotation(selectedFeature);
         }
+        $('#regiontext')[0].innerHTML = "";//"Region Annotated By: ";
+        $('#userTable').remove();
+        $('#colorTable').remove();
+        $('#statsTable').remove();
         //clear polygons and plot new multirater ones
     } else {
         $('#numRatersText')[0].innerHTML = "Number of Raters at Cursor: ";
@@ -400,6 +528,7 @@ function toggleMultiraterMode(multiraterMode) {
 function plotPointsOnImage(polygonPoints, count) {
     var user = annotatorAreaOrdered[2][count].replace(/ /g, '');
     var img_g = d3.select('#inner-g');
+    var userclass;
     img_g.append('polygon')
         .attr('points', polygonPoints)
         .attr('class', 'polygons' + ' ' + user)
@@ -421,16 +550,41 @@ function plotPointsOnImage(polygonPoints, count) {
             }
             $('.' + userclass).attr("style", "fill: lightblue; fill-opacity:0; stroke: black");
             $('#userSelectedText')[0].innerHTML = userclass.replace("User", "Region Annotated By User ");
+            userclass = userclass.replace('User', 'User ');
         })
         .on("mousemove", function() {
             timer = setTimeout(function() {
                 numRaters = 0;
                 var polys = $('.polygons');
+                var raterArray = [];
                 for (var i = 0; i < polys.length; i++) {
+                    //console.log(polys[i].className);
                     var arr = makeArr(polys[i]);
-                    numRaters = numRaters + d3.polygonContains(arr, unscaledCoords);
+
+                    var inPolygon = d3.polygonContains(arr, unscaledCoords);
+                    if (inPolygon) {
+                        var user = polys[i].className['baseVal'].replace('polygons ', '');
+                        user = user.replace('User', 'User ');
+                        raterArray.push(user);
+                    } 
+                    numRaters = numRaters + inPolygon;
                 }
                 $('#numRatersNum')[0].innerHTML = numRaters;
+                $('#otherAnnotatorsText')[0].innerHTML = "";
+                //console.log(userclass);
+                //var userclass = this.className['baseVal'].replace("polygons ", '');
+                if (numRaters > 1) {
+                    for (var i=0; i<raterArray.length; i++) {
+                        //console.log(raterArray[i] != userclass);
+                        if (raterArray[i] != userclass) {
+                            //console.log(raterArray[i], userclass);
+                            $('#otherAnnotatorsText')[0].innerHTML = $('#otherAnnotatorsText')[0].innerHTML  + raterArray[i] + "<br>";
+                        }
+                    }
+                } else if (numRaters==1) {
+                    $('#otherAnnotatorsText')[0].innerHTML = "None";
+                }
+
             }, 600);
         })
         .on("mouseout", function() {
@@ -533,6 +687,8 @@ function displayMultiraterAnnotation(selectedFeature) {
 
         origImgWidth = combinedAnnotationData['width'];
         origImgHeight = combinedAnnotationData['height'];
+        delete combinedAnnotationData['width'];
+        delete combinedAnnotationData['height'];
 
         //var keyNames = Object.keys(combinedAnnotationData);
         //annotatorAreaOrdered = sortJsObject(combinedAnnotationData);
@@ -546,7 +702,7 @@ function displayMultiraterAnnotation(selectedFeature) {
                 //if (annotatorAreaOrdered[0][i] != "0") {continue;}
                 var polygonPointString = combinedAnnotationData[keyNames[i]];
                 polygonPointJson = JSON.parse(polygonPointString);
-                console.log(polygonPointJson);
+                //console.log(polygonPointJson);
                 //for (var j = 0; j < Object.keys(polygonPointJson).length; j++) {
                 polygonPoints = polygonPointJson['0'];
                 //    if (polygonPoints.length > 10) {
@@ -555,10 +711,10 @@ function displayMultiraterAnnotation(selectedFeature) {
                 //}
             }
             d3.select('#loadingDiv').attr("style", "display:none");
-            //displayClinicalTable(selectedImageId);
-            //addAnnotatorInfo();
-            //addColorTable();
-            //addStatsTable();
+            displayClinicalTable(selectedImageId);
+            addAnnotatorInfoMultirater();
+            addMRColorTable();
+            addMRStatsTable();
 
             //$('#hiddenTables').attr("style", "display: flex");
         
@@ -694,12 +850,12 @@ function displayClinicalTable(imageId) {
         var reduced_data_for_display = {};
         reduced_data_for_display['diagnosis'] = all_clinical_data['diagnosis'];
         reduced_data_for_display['benign_malignant'] = all_clinical_data['benign_malignant'];
-        console.log(reduced_data_for_display);
-        num_entries = $('#userTable').children().children().length;
+        //console.log(reduced_data_for_display);
+        num_entries = $('#userTable').children().children().length || 4;
         //delete all_clinical_data['diagnosis'];
         //delete all_clinical_data['benign_malignant'];
 
-        console.log(all_clinical_data);
+        //console.log(all_clinical_data);
         for (var i = 0; i < num_entries; i++) {
             if (Object.values(all_clinical_data)[i] == null) {
                 continue;
@@ -827,7 +983,7 @@ function createImageMenu() {
                 }
             });
             if (selectedImageIndex == 0) {
-                console.log('0');
+                //console.log('0');
                 d3.select('#leftarrow').attr('style', 'display: none');
                 d3.select('#rightarrow').attr('style', 'display: block');
             }

@@ -134,6 +134,9 @@ img {
     /* fill-opacity: 1;
      */
 }
+ #otherAnnotatorsText {
+    margin-top: -20px;
+ }
  #inner-g {
      isolation: isolate;
 }

@@ -56,7 +56,7 @@ def retrieveData(url):
     return data
 
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
-def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
+def retrieveMultiraterAnnotationMasks(study_id, image_id, feature): #need to return multirater matrix
     feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
     combined_pixel_data = {}
     url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
@@ -85,9 +85,14 @@ def retrieveMultiraterAnnotationMasks(study_id, image_id, feature):
         if np.amax(img_matrix) == 0:
         	continue
         img_matrix = np.uint8(img_matrix.astype(int))
+        area = np.where(img_matrix != 0)
+        area = json.dumps(area[0].size)
+        if area == '0':
+            continue
         contour_data = getContours(img_matrix, segmentation=False)
         pixelJson = retrievePixelDataAsJson(contour_data)
         combined_pixel_data[str(count)] = pixelJson
+        combined_pixel_data[str(count)+'_area'] = area 
     return combined_pixel_data
 
 @app.route('/annotationMasks/<study_id>/<image_id>/<feature>')
