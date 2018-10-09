@@ -395,6 +395,11 @@ function createFeatureMenu() { //need to clear feature menu
                 featureListTmp.push(x + " [" + featureData[x].length + "]");
             });
             featureList = featureListTmp;
+            if (featureList.length == 0) {
+                featurePlaceholderText = "No Markup For This Image";
+            } else {
+                featurePlaceholderText = 'Select a Feature';
+            }
             addOptions('featureSelector', featureList, 'Select a Feature');
         });
     }
