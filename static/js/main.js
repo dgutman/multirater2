@@ -953,8 +953,9 @@ function createStudyMenu() {
         studyNames = studyNamesTmp;
         addOptions('studySelector', studyNames, 'Select a Study');
         $('#studySelector').change(function() {
-            $('#selectors > span:nth-child(5)').remove()
-            $($('.selectorNum')[1]).after(' <select id="imageSelector" class="selector"></select>')
+            $('#imageSelector').remove();
+            $('#selectors > span:nth-child(5)').remove();
+            $($('.selectorNum')[1]).after(' <select id="imageSelector" class="selector"></select>');
             selectedStudy = this.value;
             $.each(studies, function(key, value) {
                 if (value.name == selectedStudy) {
