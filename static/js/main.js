@@ -102,6 +102,7 @@ $(document).ready(function() {
             a = $('#loginUsername').val()
             b = $('#loginPassword').val();
             $.modal.close();
+            axios.defaults.headers.common['Girder-Token'] = 'aadiaadiaadiaadi';
             authenticate(a,b);
             createStudyMenu();
         });
