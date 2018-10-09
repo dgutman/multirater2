@@ -90,9 +90,24 @@ $(document).ready(function() {
             $.modal.close();
         });
     });
+    $('#login').click(function() {
+        $('#loginModal').children().remove();
+        $('#loginModal').append('<h3>Log in using ISIC credentials: </h3>')
+        $('#loginModal').append('<table><tr><td>Username: </td><td><input id="loginUsername"></input></td></tr><tr><td>Password: </td><td><input id="loginPassword" type="password"></input></td></tr></table><br>');
+        $('#loginModal').append("<span id='loginSubmit'>Submit</span>");
+
+        $('#loginModal').modal();
+
+        $('#loginSubmit').click(function() {
+            a = $('#loginUsername').val()
+            b = $('#loginPassword').val();
+            $.modal.close();
+            authenticate(a,b);
+            createStudyMenu();
+        });
+    });
     //d3.select('#viewer').append('div').attr('id', 'infoPanel');
     addViewerInfo();
-
 })
 
 function activateSwitches() {
@@ -217,12 +232,10 @@ function addColorTable() {
         } else {
             annotatorstxt = (i + 1) + " Annotators";
         }
-
         divStr = ""
         for (var j = 0; j < i + 1; j++) {
             divStr = divStr + "<span class='colorBox'></span>";
         }
-
         content = content + '<tr>' + "<td class='userColor'>" + divStr + "</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
     }
     content = content + '</table>';
@@ -236,9 +249,7 @@ function addStatsTable() {
     delete raterNumbers['height'];
     delete raterNumbers['width'];
     raterNumbers = Object.values(raterNumbers);
-
     $('#statsTable').remove();
-
     content = '<table id="statsTable">';
     for (var i = 0; i < annotatorAreaOrdered[2].length; i++) {
         numraters = i + 1;
@@ -248,7 +259,6 @@ function addStatsTable() {
         i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2) + "%";
         i_plus_rater_agreement = (Object.values(raterNumbers).reduce(reducer) / segmentationArea) * 100;
         i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2) + "%";
-
         content = content + '<tr>' + "<td class='raterNum'>" + ratertxt + "</td>"+
                                      "<td class='calculation'>" + i_rater_agreement + '</td>' + 
                                      "<td class='raterNum'>" + rater_plus_txt + "</td>" +
@@ -259,7 +269,6 @@ function addStatsTable() {
     $('#statsInformation').append(content);
     $('#statsTable').easyTable();
     $('#easyMenuTable').remove();
-
 }
 
 function addMRColorTable() {
@@ -267,12 +276,10 @@ function addMRColorTable() {
     content = '<table id="colorTable">';
     for (var i = 0; i < Object.keys(combinedAnnotationData).length/2; i++) {
             annotatorstxt = (i + 2) + " Annotators";
-
         divStr = ""
         for (var j = 0; j < i + 1; j++) {
             divStr = divStr + "<span class='colorBox'></span>";
         }
-
         content = content + '<tr>' + "<td class='userColor'>" + divStr + "</td><td class='colorInfoAnnotator'>" + annotatorstxt + '</td></tr>';
     }
     content = content + '</table>';
@@ -282,11 +289,6 @@ function addMRColorTable() {
 }
 
 function addMRStatsTable() {
-    //raterNumbers = multiraterMatrix;
-    //delete raterNumbers['height'];
-    //delete raterNumbers['width'];
-    //raterNumbers = Object.values(raterNumbers);
-
     $('#statsTable').remove();
     area_keys = Object.keys(combinedAnnotationData).filter(function(x){if (x.includes("area")) {return x}});
     content = '<table id="statsTable">';
@@ -298,7 +300,6 @@ function addMRStatsTable() {
         //i_rater_agreement = parseFloat(i_rater_agreement).toFixed(2) + "%";
         i_plus_rater_agreement = (combinedAnnotationData[area_keys[i]] / segmentationArea) * 100;
         i_plus_rater_agreement = parseFloat(i_plus_rater_agreement).toFixed(2) + "%";
-
         content = content + '<tr>' + //"<td class='raterNum'>" + ratertxt + "</td>"+
                                      //"<td class='calculation'>" + i_rater_agreement + '</td>' + 
                                      "<td class='raterNum'>" + rater_plus_txt + "</td>" +
@@ -527,7 +528,6 @@ function toggleMultiraterMode(multiraterMode) {
         }
         //clear polygons and plot single rater ones
     }
-
 }
 
 function plotPointsOnImage(polygonPoints, count) {
@@ -589,7 +589,6 @@ function plotPointsOnImage(polygonPoints, count) {
                 } else if (numRaters==1) {
                     $('#otherAnnotatorsText')[0].innerHTML = "None";
                 }
-
             }, 600);
         })
         .on("mouseout", function() {
