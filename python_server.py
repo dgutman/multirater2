@@ -213,13 +213,14 @@ def retrieveImageDetails(image_id):
 
 @app.route('/studyList')
 def retrieveStudyList():
-    print(request.headers);
+    print(request.headers)
     url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
     studyList = retrieveData(url)
     return studyList
 
 @app.route('/imageList/<study_id>')
 def retrieveImageList(study_id):
+    print(request.headers)
     url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
     imageList = retrieveData(url)
     return imageList
