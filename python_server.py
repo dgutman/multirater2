@@ -213,7 +213,7 @@ def retrieveImageDetails(image_id):
 
 @app.route('/studyList')
 def retrieveStudyList():
-    print(request.headers['Girder-Token']);
+    print(request.headers);
     url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
     studyList = retrieveData(url)
     return studyList
