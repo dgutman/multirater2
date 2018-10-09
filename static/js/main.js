@@ -104,6 +104,9 @@ $(document).ready(function() {
             $.modal.close();
             axios.defaults.headers.common['Girder-Token'] = 'aadiaadiaadiaadi';
             authenticate(a,b);
+            $('#studySelector').remove();
+            $('#selectors > span:nth-child(3)').remove();
+            $($('.selectorNum')[0]).after(' <select id="studySelector" class="selector"></select>');
             createStudyMenu();
         });
     });
