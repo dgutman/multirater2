@@ -400,7 +400,7 @@ function createFeatureMenu() { //need to clear feature menu
             } else {
                 featurePlaceholderText = 'Select a Feature';
             }
-            addOptions('featureSelector', featureList, 'Select a Feature');
+            addOptions('featureSelector', featureList, featurePlaceholderText);
         });
     }
 }
