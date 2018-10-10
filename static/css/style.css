@@ -93,7 +93,7 @@ img {
      min-width: 150px;
 }
  #studySelector {
-    min-width: 250px;
+    min-width: 250px !important;
 }
  #selectors select {
     display: none;
