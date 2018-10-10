@@ -93,7 +93,7 @@ img {
      min-width: 150px;
 }
  #featureSelector {
-     min-width: 150px;
+    /* min-width: 150px;*/
 }
  #selectors select {
     display: none;
