@@ -1033,7 +1033,7 @@ function activateSelect(elementId, placeholderText) {
             text: placeholderText
         },
         allowClear: true,
-        width: 'resolve'
+        width: 'min-width: 150px'
     });
 }
 
