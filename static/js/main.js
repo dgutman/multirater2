@@ -1032,7 +1032,8 @@ function activateSelect(elementId, placeholderText) {
             id: '-1', // the value of the option
             text: placeholderText
         },
-        allowClear: true
+        allowClear: true,
+        width: 'resolve'
     });
 }
 
