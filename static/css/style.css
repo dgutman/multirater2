@@ -86,7 +86,7 @@ img {
      color: #6E7480;
 }
  #selectors {
-     display: table;
+     display: inline-flex;
      margin: 25px auto;
 }
  #imageSelector {
@@ -95,6 +95,9 @@ img {
  #featureSelector {
      min-width: 150px;
 }
+ #selectors select {
+    display: none;
+ }
  .selectorNum {
      width: 36px;
      height: 36px;
