@@ -44,3 +44,93 @@ def retrievePixelDataAsJson(contour_data):
         pixel_data[object_num] = contour_pixel_data  # append contour objects to dictionary
     json_data = json.dumps(pixel_data)  # convert dictionary to json
     return json_data  # return data as json
+def retrieveData(url):
+    return combined_pixel_data
+@app.route('/annotationMasks/<study_id>/<image_id>/<feature>')
+def retrieveAnnotationMasks(study_id, image_id, feature):
+    feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
+    combined_pixel_data = {}
+    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
+        + '&imageId=' + image_id + '&state=complete'  # create url for ISIC annotation mask endpoint
+    annotationData = retrieveData(url)
+    annotation_ids = [annotation['_id'] for annotation in annotationData]
+    counter = 0
+    for annotation_id in annotation_ids:
+        url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotation_id \
+            + '/' + feature2 + '/mask'
+        image = url_to_image(url)  # get image
+        contour_data = getContours(image, segmentation=False)  # get contours
+        area = np.where(image != 0)
+        area = json.dumps(area[0].size)
+        if area == '0':
+            continue
+        pixelJson = retrievePixelDataAsJson(contour_data)  # convert to json
+        combined_pixel_data[annotation_id] = pixelJson
+        combined_pixel_data[annotation_id + '_area'] = area
+        if counter != 0:
+            img_matrix = np.add(img_matrix, image, dtype=np.float)
+        else:
+            img_matrix = image
+            (img_h, img_w) = image.shape[:2]
+        counter = counter + 1
+    img_matrix_flat = img_matrix.flatten()
+    img_matrix_flat = img_matrix_flat / 255
+    #print(np.amax(img_matrix_flat))
+    img_matrix_fl = {}
+    img_matrix_fl['width'] = img_w
+    img_matrix_fl['height'] = img_h
+    for i in range(1, counter + 1):
+        ind = np.where(img_matrix_flat == i)
+        ind = ind[0].size
+        img_matrix_fl[str(i) + ' rater'] = ind
+    img_matrix_json = json.dumps(img_matrix_fl)
+    combined_pixel_data['multiraterMatrix'] = img_matrix_json
+    return combined_pixel_data
+
+    image = url_to_image(BASE_URL + ISIC_SEGMENTATION_ENDPOINT + '/'
+                         + segmentation_id + '/' + 'mask')  # get image
+    area = np.where(image != 0)
+    area = json.dumps(area[0].size)
+    return area
+@app.route('/usersFromAnnotation', methods=['POST'])
+def getUsersFromAnnotation():
+    req_data = request.get_json()
+    usernames = []
+    for i in range(0, len(req_data)):
+        url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + req_data[i]
+        resp = urllib.request.urlopen(url)
+        resp = resp.read().decode('utf-8')
+        user_name = json.loads(resp)['user']['name']
+        usernames.append(user_name)
+    return str(usernames)
+@app.route('/imageDetails/<image_id>')
+def retrieveImageDetails(image_id):
+    imageDetailsClean = {}
+    url = BASE_URL + ISIC_IMAGE_ENDPOINT + '/' + image_id
+    imageDetails = retrieveData(url)
+    imageDetailsClean['dataset'] = imageDetails['dataset']
+    imageDetailsClean['acquisition'] = imageDetails['meta']['acquisition']
+    imageDetailsClean['clinical'] = imageDetails['meta']['clinical']
+    imageDetailsClean['image'] = {}
+    imageDetailsClean['image']['name'] = imageDetails['name']
+    imageDetailsClean['image']['_id'] = image_id
+    imageDetailsClean['dataset'].pop('updated', None)
+    imageDetailsClean['dataset'].pop('_accessLevel', None)
+    return imageDetailsClean
+@app.route('/studyList')
+def retrieveStudyList():
+    print(request.headers)
+    url = BASE_URL + ISIC_STUDY_ENDPOINT + '?limit=500'
+    studyList = retrieveData(url)
+    return studyList
+@app.route('/imageList/<study_id>')
+def retrieveImageList(study_id):
+    print(request.headers)
+    url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id
+    imageList = retrieveData(url)
+    return imageList
+@app.route('/')
+def main():
+    return render_template('multirater.html')
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=PORT)
