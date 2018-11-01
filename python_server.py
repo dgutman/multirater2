@@ -60,7 +60,7 @@ def compileStudyData(study_id):
     imageList = retrieveImageList(study_id)
     #print(imageList['images'])
     #print(imageList['features'])
-    for image in imageList:
+    for image in imageList['images']:
         imageId = image['_id']
         print(imageId)
     return imageList
