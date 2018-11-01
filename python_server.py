@@ -58,11 +58,10 @@ def retrieveData(url):
 @app.route('/compileStudyData/<study_id>')
 def compileStudyData(study_id):
     imageList = retrieveImageList(study_id)
-    #print(imageList['images'])
-    #print(imageList['features'])
     for image in imageList['images']:
         imageId = image['_id']
-        print(imageId)
+        imagesFeatures = retrieveFeaturesForStudyImage(study_id, imageId)
+        print(imageFeatures)
     return imageList
     
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
