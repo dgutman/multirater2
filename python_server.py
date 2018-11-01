@@ -60,7 +60,8 @@ def compileStudyData(study_id):
     imageList = retrieveImageList(study_id)
     print(imageList['images'])
     print(imageList['features'])
-
+    return 0
+    
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
 def retrieveMultiraterAnnotationMasks(study_id, image_id, feature): #need to return multirater matrix
     feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
