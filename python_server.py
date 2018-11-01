@@ -57,11 +57,21 @@ def retrieveData(url):
 
 @app.route('/compileStudyData/<study_id>')
 def compileStudyData(study_id):
+    #studyName = getStudyName()
+    rowCounter = 0
+    dataframe = pd.DataFrame()
     imageList = retrieveImageList(study_id)
     for image in imageList['images']:
         imageId = image['_id']
+        imageName = image['name']
         imageFeatures = retrieveFeaturesForStudyImage(study_id, imageId)
         print(imageFeatures)
+        for feature in imageFeatures:
+            featureName = feature.keys()
+#            annotationIds = feature[featureName]
+#            for annotation in annotationIds:
+            annotationData = retrieveAnnotationMasks(study_id, imageId, featureName)
+            rowCounter += 1
     return imageList
     
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
