@@ -61,7 +61,7 @@ def compileStudyData(study_id):
     #print(imageList['images'])
     #print(imageList['features'])
     for image in imageList:
-        imageId = image[0]['id']
+        imageId = image
         print(imageId)
     return imageList
     
