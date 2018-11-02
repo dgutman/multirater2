@@ -90,8 +90,8 @@ def compileStudyData(study_id):
     for i in range(0, len(userTable)):
         dfColumnNames.append(str(i)+'-rater agreement')
     dataframe = pd.DataFrame(columns=dfColumnNames)
-    print(dataframe)
     studyName = getStudyName(study_id)
+    print(studyName)
     imageList = retrieveImageList(study_id)
     for image in imageList['images']:
         imageId = image['_id']
