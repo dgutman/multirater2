@@ -88,23 +88,24 @@ def compileStudyData(study_id):
     for index, row in userTable.iterrows():
         dfColumnNames.append(row['userName'])
     for i in range(0, len(userTable)):
-        dfColumnNames.append(str(i)+'-rater agreement')
-    dataframe = pd.DataFrame(columns=dfColumnNames)
+        dfColumnNames.append(str(i+1)+'-rater agreement')
+    dataframe = pd.DataFrame(index=range(10000), columns=dfColumnNames)
     studyName = getStudyName(study_id)
-    print(studyName)
     imageList = retrieveImageList(study_id)
+    dataframe['studyId']
     for image in imageList['images']:
         imageId = image['_id']
         imageName = image['name']
+
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
+        imageDiagnosis = getImageDiagnosis(imageId)
+
         for feature in imageFeatures.keys():
-            #annotationIds = imageFeatures[feature]
+            
             feature = feature.replace('/', '_')
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
             annotationDataNames = annotationData.keys()
-            print(annotationDataNames)
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
-            print(annotationDataNames)
             rowCounter += 1
     return imageList
     
