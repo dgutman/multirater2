@@ -72,7 +72,7 @@ def getUsersForStudy(study_id):
     return users
 
 def getStudyName(study_id):
-    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&format=json'
+    url = BASE_URL + ISIC_STUDY_ENDPOINT + '/' + study_id + '&format=json'
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
     response = json.loads(resp)
