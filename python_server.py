@@ -101,7 +101,7 @@ def compileStudyData(study_id):
     print(dataframe)
     studyName = getStudyName(study_id)
     imageList = retrieveImageList(study_id)
-    dataframe[rowCounter]['studyId'] = study_id
+    dataframe['studyId'].iloc[rowCounter] = study_id
     dataframe[rowCounter]['studyName'] = studyName
     
     for image in imageList['images']:
