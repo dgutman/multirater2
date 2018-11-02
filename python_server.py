@@ -119,7 +119,7 @@ def retrieveMultiraterAnnotationMasks(study_id, image_id, feature): #need to ret
 @app.route('/annotationMasks/<study_id>/<image_id>/<feature>')
 def retrieveAnnotationMasks(study_id, image_id, feature):
     feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
-    feature2 = urllib.parse.quote(feature2.replace(' ', '_'))
+    #feature2 = urllib.parse.quote(feature2.replace(' ', '_'))
     combined_pixel_data = {}
     url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id \
         + '&imageId=' + image_id + '&state=complete'  # create url for ISIC annotation mask endpoint
