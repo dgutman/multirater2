@@ -50,6 +50,7 @@ def retrievePixelDataAsJson(contour_data):
     return json_data  # return data as json
 
 def retrieveData(url):
+    print(url)
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
     data = json.loads(resp)
