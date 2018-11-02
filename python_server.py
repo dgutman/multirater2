@@ -118,6 +118,7 @@ def retrieveMultiraterAnnotationMasks(study_id, image_id, feature): #need to ret
 
 @app.route('/annotationMasks/<study_id>/<image_id>/<feature>')
 def retrieveAnnotationMasks(study_id, image_id, feature):
+    print(feature)
     feature2 = urllib.parse.quote(feature.replace('_', '%2F'))
     print(feature2)
     #feature2 = urllib.parse.quote(feature2.replace(' ', '_'))
