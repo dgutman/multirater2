@@ -66,9 +66,9 @@ def compileStudyData(study_id):
         imageName = image['name']
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
         for feature in imageFeatures.keys():
-            featureName = feature
-            print('feature: ', feature)
-#            annotationIds = feature[featureName]
+            #annotationIds = imageFeatures[feature]
+            xdata = retrieveAnnotationMasks(study_id, imageId, feature)
+            print(xdata)
 #            for annotation in annotationIds:
             #annotationData = retrieveAnnotationMasks(study_id, imageId, featureName)
             #print(annotationData)
