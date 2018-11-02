@@ -71,6 +71,7 @@ def compileStudyData(study_id):
 #            annotationIds = feature[featureName]
 #            for annotation in annotationIds:
             annotationData = retrieveAnnotationMasks(study_id, imageId, featureName)
+            print(annotationData)
             rowCounter += 1
     return imageList
     
