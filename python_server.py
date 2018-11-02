@@ -80,7 +80,7 @@ def compileStudyData(study_id):
     for index, row in userTable.iterrows():
         dfColumnNames.append(row['userName'])
     for i in range(0, len(userTable)):
-        dfColumnNames.append(i+'-rater agreement')
+        dfColumnNames.append(str(i)+'-rater agreement')
     dataframe = pd.DataFrame(columns=dfColumnNames)
     print(dataframe)
 
