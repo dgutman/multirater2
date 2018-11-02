@@ -71,7 +71,7 @@ def compileStudyData(study_id):
             feature = feature.replace('/', '_')
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
             annotationDataNames = annotationData.keys()
-            annotationDataNames = list(filter(lambda x:'_name' in x, annotationDataNames))
+            annotationDataNames = [name for name in annotationDataNames if '_name' in name]
             print(annotationDataNames)
             rowCounter += 1
     return imageList
