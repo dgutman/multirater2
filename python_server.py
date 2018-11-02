@@ -77,7 +77,7 @@ def compileStudyData(study_id):
     rowCounter = 0
     dfColumnNames = ['studyId', 'studyName', 'imageId', 'imageName', 'diagnosis', 'feature']
     userTable = getUsersForStudy(study_id)
-    for row in userTable:
+    for row in userTable.iterrows():
         dfColumnNames.append(row['userName'])
     for i in range(0, len(userTable)):
         dfColumnNames.append(i+'-rater agreement')
