@@ -57,6 +57,8 @@ def retrieveData(url):
     return data
 
 def getUsersForStudy(study_id):
+    userIds = []
+    userNames = []
     url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&detail=true'
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
