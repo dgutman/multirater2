@@ -120,7 +120,7 @@ def compileStudyData(study_id):
             print(annotationData)
             annotationDataNames = annotationData.keys()
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
-            print(head(dataframe))
+            print(dataframe.head())
             rowCounter += 1
     return imageList
     
