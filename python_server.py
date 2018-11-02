@@ -50,7 +50,7 @@ def retrievePixelDataAsJson(contour_data):
     return json_data  # return data as json
 
 def retrieveData(url):
-    print(url)
+    #print(url)
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
     data = json.loads(resp)
@@ -59,7 +59,7 @@ def retrieveData(url):
 def getUsersForStudy(study_id):
     userIds = []
     userNames = []
-    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&detail=true'
+    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&state=complete&detail=true'
     resp = urllib.request.urlopen(url)  # retrieve data
     resp = resp.read().decode('utf-8')  # parse data
     response = json.loads(resp)
@@ -70,6 +70,14 @@ def getUsersForStudy(study_id):
     userDf.columns = ['userId','userName']
     users = userDf.groupby(['userId','userName']).size().reset_index()
     return users
+
+def getStudyName(study_id):
+    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&format=json'
+    resp = urllib.request.urlopen(url)  # retrieve data
+    resp = resp.read().decode('utf-8')  # parse data
+    response = json.loads(resp)
+    studyName = response['name']
+    return studyName
 
 @app.route('/compileStudyData/<study_id>')
 def compileStudyData(study_id):
@@ -83,7 +91,7 @@ def compileStudyData(study_id):
         dfColumnNames.append(str(i)+'-rater agreement')
     dataframe = pd.DataFrame(columns=dfColumnNames)
     print(dataframe)
-
+    studyName = getStudyName(study_id)
     imageList = retrieveImageList(study_id)
     for image in imageList['images']:
         imageId = image['_id']
