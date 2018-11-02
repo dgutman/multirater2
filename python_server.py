@@ -79,6 +79,14 @@ def getStudyName(study_id):
     studyName = response['name']
     return studyName
 
+def getImageDiagnosis(image_id):
+    url = BASE_URL + ISIC_IMAGE_ENDPOINT + '/' + image_id
+    resp = urllib.request.urlopen(url)  # retrieve data
+    resp = resp.read().decode('utf-8')  # parse data
+    response = json.loads(resp)
+    diagnosis = response['meta']['clinical']['diagnosis']
+    return diagnosis
+    
 @app.route('/compileStudyData/<study_id>')
 def compileStudyData(study_id):
     #studyName = getStudyName()
@@ -92,20 +100,25 @@ def compileStudyData(study_id):
     dataframe = pd.DataFrame(index=range(10000), columns=dfColumnNames)
     studyName = getStudyName(study_id)
     imageList = retrieveImageList(study_id)
-    dataframe['studyId']
+    dataframe[rowCounter]['studyId'] = study_id
+    dataframe[rowCounter]['studyName'] = studyName
+    
     for image in imageList['images']:
         imageId = image['_id']
         imageName = image['name']
 
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
         imageDiagnosis = getImageDiagnosis(imageId)
-
+        dataframe[rowCounter]['imageId'] = imageId
+        dataframe[rowCounter]['imageName'] = imageName
+        dataframe[rowCounter]['diagnosis'] = imageDiagnosis
         for feature in imageFeatures.keys():
-            
+            dataframe[rowCounter]['feature'] = feature
             feature = feature.replace('/', '_')
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
             annotationDataNames = annotationData.keys()
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
+            print(dataframe)
             rowCounter += 1
     return imageList
     
