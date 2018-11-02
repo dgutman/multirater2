@@ -65,7 +65,9 @@ def compileStudyData(study_id):
         imageId = image['_id']
         imageName = image['name']
         imageFeatures = retrieveFeaturesForStudyImage(study_id, imageId)
-        print(imageFeatures)
+        im = json.loads(imageFeatures)
+        print(im)
+        return false
         for feature in imageFeatures:
             #featureName = feature.keys()
             print('feature: ', feature)
