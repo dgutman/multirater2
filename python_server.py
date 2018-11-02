@@ -56,11 +56,32 @@ def retrieveData(url):
     data = json.loads(resp)
     return data
 
+def getUsersForStudy(study_id):
+    url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '?studyId=' + study_id + '&detail=true'
+    resp = urllib.request.urlopen(url)  # retrieve data
+    resp = resp.read().decode('utf-8')  # parse data
+    response = json.loads(resp)
+    for i in range(0, len(response)):
+        userIds.append(pd.DataFrame(response)['user'][i]['_id'])
+        userNames.append(pd.DataFrame(response)['user'][i]['name'])
+    userDf = pd.DataFrame([userIds, userNames]).transpose()
+    userDf.columns = ['userId','userName']
+    users = userDf.groupby(['userId','userName']).size().reset_index()
+    return users
+
 @app.route('/compileStudyData/<study_id>')
 def compileStudyData(study_id):
     #studyName = getStudyName()
     rowCounter = 0
-    dataframe = pd.DataFrame()
+    dfColumnNames = ['studyId', 'studyName', 'imageId', 'imageName', 'diagnosis', 'feature']
+    userTable = getUsersForStudy(study_id)
+    for row in userTable:
+        dfColumnNames.append(row['userName'])
+    for i in range(0, len(userTable)):
+        dfColumnNames.append(i+'-rater agreement')
+    dataframe = pd.DataFrame(columns=dfColumnNames)
+    print(dataframe)
+
     imageList = retrieveImageList(study_id)
     for image in imageList['images']:
         imageId = image['_id']
