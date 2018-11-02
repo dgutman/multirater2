@@ -72,7 +72,7 @@ def compileStudyData(study_id):
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
             annotationDataNames = annotationData.keys()
             print(annotationDataNames)
-            annotationDataNames = [name for name in annotationDataNames if '_name' in name]
+            annotationDataNames = [name for name in annotationDataNames if '_area' in name]
             print(annotationDataNames)
             rowCounter += 1
     return imageList
