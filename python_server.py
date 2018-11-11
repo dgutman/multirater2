@@ -122,7 +122,7 @@ def compileStudyData(study_id):
                 url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotationId.replace('_area', '')
                 annotationMetadata = retrieveData(url)
                 userId = annotationMetadata['user']['name']
-                dataframe[userId].iloc[rowCounter] = annotationData['annotationId']
+                dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
             print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
             rowCounter += 1
