@@ -120,12 +120,13 @@ def compileStudyData(study_id):
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
             mm = json.loads(annotationData['multiraterMatrix'])
             raterCount = [rater for rater in mm.keys() if 'rater' in rater]
+            raterCount = len(raterCount)
             for annotationId in annotationDataNames:
                 url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotationId.replace('_area', '')
                 annotationMetadata = retrieveData(url)
                 userId = annotationMetadata['user']['name']
                 dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
-            for i in range(0, len(userTable)-1):
+            for i in range(0, raterCount):
                 dataframe[(str(i+1)+'-rater agreement')] = mm[str(i+1)+' rater']
             print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
