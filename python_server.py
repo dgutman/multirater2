@@ -190,6 +190,7 @@ def retrieveAnnotationMasks(study_id, image_id, feature):
         url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotation_id \
             + '/' + feature2 + '/mask'
         image = url_to_image(url)  # get image
+        img_matrix = image
         contour_data = getContours(image, segmentation=False)  # get contours
         area = np.where(image != 0)
         area = json.dumps(area[0].size)
