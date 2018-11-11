@@ -124,7 +124,7 @@ def compileStudyData(study_id):
                 userId = annotationMetadata['user']['name']
                 dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
             for i in range(0, len(userTable)-1):
-                dataframe[(str(i+1)+'-rater agreement')] = annotationData['multiraterMatrix'][str(i+1)+' rater']
+                dataframe[(str(i+1)+'-rater agreement')] = json.loads(annotationData['multiraterMatrix'])[str(i+1)+' rater']
             print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
             rowCounter += 1
