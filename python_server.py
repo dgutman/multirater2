@@ -110,10 +110,10 @@ def compileStudyData(study_id):
 
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
         imageDiagnosis = getImageDiagnosis(imageId)
-        dataframe['imageId'].iloc[rowCounter] = imageId
-        dataframe['imageName'].iloc[rowCounter] = imageName
-        dataframe['diagnosis'].iloc[rowCounter] = imageDiagnosis
         for feature in imageFeatures.keys():
+           dataframe['imageId'].iloc[rowCounter] = imageId
+            dataframe['imageName'].iloc[rowCounter] = imageName
+            dataframe['diagnosis'].iloc[rowCounter] = imageDiagnosis
             dataframe['feature'].iloc[rowCounter] = feature
             feature = feature.replace('/', '_')
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
