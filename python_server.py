@@ -95,7 +95,7 @@ def compileStudyData(study_id):
     userTable = getUsersForStudy(study_id)
     for index, row in userTable.iterrows():
         dfColumnNames.append(row['userName'])
-    for i in range(0, len(userTable)):
+    for i in range(0, len(userTable)-1):
         dfColumnNames.append(str(i+1)+'-rater agreement')
     dataframe = pd.DataFrame(index=range(10000), columns=dfColumnNames)
     print(dataframe)
@@ -123,6 +123,8 @@ def compileStudyData(study_id):
                 annotationMetadata = retrieveData(url)
                 userId = annotationMetadata['user']['name']
                 dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
+            for i in range(0, len(userTable)-1):
+                dataframe[(str(i+1)+'-rater agreement')] = annotationData[str(i+1)+' rater']
             print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
             rowCounter += 1
