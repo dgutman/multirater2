@@ -118,8 +118,13 @@ def compileStudyData(study_id):
             #print(annotationData)
             annotationDataNames = annotationData.keys()
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
+            for annotationId in annotationDataNames:
+                url = BASE_URL + ISIC_ANNOTATION_ENDPOINT + '/' + annotationId.replace('_area', '')
+                annotationMetadata = retrieveData(url)
+                userId = annotationMetadata['user']['name']
+                dataframe[userId].iloc[rowCounter] = annotationData['annotationId']
             print(dataframe.iloc[rowCounter])
-            print(annotationDataNames)
+            #print(annotationDataNames)
             rowCounter += 1
     return imageList
     
