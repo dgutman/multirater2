@@ -101,16 +101,14 @@ def compileStudyData(study_id):
     print(dataframe)
     studyName = getStudyName(study_id)
     imageList = retrieveImageList(study_id)
-    dataframe['studyId'].iloc[rowCounter] = study_id
-    dataframe['studyName'].iloc[rowCounter] = studyName
-    
     for image in imageList['images']:
         imageId = image['_id']
         imageName = image['name']
-
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
         imageDiagnosis = getImageDiagnosis(imageId)
         for feature in imageFeatures.keys():
+            dataframe['studyId'].iloc[rowCounter] = study_id
+            dataframe['studyName'].iloc[rowCounter] = studyName
             dataframe['imageId'].iloc[rowCounter] = imageId
             dataframe['imageName'].iloc[rowCounter] = imageName
             dataframe['diagnosis'].iloc[rowCounter] = imageDiagnosis
