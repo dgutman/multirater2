@@ -117,10 +117,11 @@ def compileStudyData(study_id):
             dataframe['feature'].iloc[rowCounter] = feature
             feature = feature.replace('/', '_')
             annotationData = retrieveAnnotationMasks(study_id, imageId, feature)
-            print(annotationData)
+            #print(annotationData)
             annotationDataNames = annotationData.keys()
             annotationDataNames = [name for name in annotationDataNames if '_area' in name]
-            print(dataframe.head())
+            print(dataframe.iloc[rowCounter])
+            print(annotationDataNames)
             rowCounter += 1
     return imageList
     
