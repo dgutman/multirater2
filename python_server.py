@@ -111,7 +111,7 @@ def compileStudyData(study_id):
         imageFeatures = json.loads(retrieveFeaturesForStudyImage(study_id, imageId))
         imageDiagnosis = getImageDiagnosis(imageId)
         for feature in imageFeatures.keys():
-           dataframe['imageId'].iloc[rowCounter] = imageId
+            dataframe['imageId'].iloc[rowCounter] = imageId
             dataframe['imageName'].iloc[rowCounter] = imageName
             dataframe['diagnosis'].iloc[rowCounter] = imageDiagnosis
             dataframe['feature'].iloc[rowCounter] = feature
