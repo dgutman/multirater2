@@ -98,7 +98,7 @@ def compileStudyData(study_id):
     for i in range(0, len(userTable)-1):
         dfColumnNames.append(str(i+1)+'-rater agreement')
     dataframe = pd.DataFrame(index=range(10000), columns=dfColumnNames)
-    print(dataframe)
+    #print(dataframe)
     studyName = getStudyName(study_id)
     imageList = retrieveImageList(study_id)
     for image in imageList['images']:
@@ -128,9 +128,10 @@ def compileStudyData(study_id):
                 dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
             for i in range(0, raterCount):
                 dataframe[(str(i+1)+'-rater agreement')].iloc[rowCounter] = mm[str(i+1)+' rater']
-            print(dataframe.iloc[rowCounter])
+            #print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
             rowCounter += 1
+    dataframe.to_csv('studyData.csv')
     return imageList
     
 @app.route('/multiraterAnnotationMasks/<study_id>/<image_id>/<feature>')
