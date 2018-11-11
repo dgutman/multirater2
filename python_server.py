@@ -127,8 +127,8 @@ def compileStudyData(study_id):
                 userId = annotationMetadata['user']['name']
                 dataframe[userId].iloc[rowCounter] = annotationData[annotationId]
             for i in range(0, raterCount):
-                dataframe[(str(i+1)+'-rater agreement')] = mm[str(i+1)+' rater']
-            print(dataframe.head())
+                dataframe[(str(i+1)+'-rater agreement')].iloc[rowCounter] = mm[str(i+1)+' rater']
+            print(dataframe.iloc[rowCounter])
             #print(annotationDataNames)
             rowCounter += 1
     return imageList
