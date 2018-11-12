@@ -95,7 +95,7 @@ def compileStudyData(study_id):
     userTable = getUsersForStudy(study_id)
     for index, row in userTable.iterrows():
         dfColumnNames.append(row['userName'])
-    for i in range(0, len(userTable)-1):
+    for i in range(0, len(userTable)):
         dfColumnNames.append(str(i+1)+'-rater agreement')
     dataframe = pd.DataFrame(index=range(10000), columns=dfColumnNames)
     #print(dataframe)
